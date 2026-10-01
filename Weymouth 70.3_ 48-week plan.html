@@ -1,0 +1,1501 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Weymouth 70.3: 48-week plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..850&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EDF2F1; --panel:#F8FBFA; --ink:#13242B; --muted:#55666C; --rule:#CBD8D7; --rule-strong:#9DB0B0;
+  --swim:#1B6C8A; --bike:#C08A12; --run:#BF3A2C; --lift:#6E797E; --rest:#A3B0B2; --heat:#8A5A2B; --race:#13242B;
+  --band1:#DCE6E5; --band2:#E7EEED; --focus:#1B6C8A; --hl:#13242B;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D181C; --panel:#13232A; --ink:#E2EBEA; --muted:#97A9AD; --rule:#23373E; --rule-strong:#3B5660;
+    --swim:#58AACA; --bike:#E2B045; --run:#EA6553; --lift:#9AA6AB; --rest:#5D6E73; --heat:#D29A5E; --race:#E2EBEA;
+    --band1:#16282F; --band2:#1B2F37; --focus:#58AACA; --hl:#E2EBEA;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D181C; --panel:#13232A; --ink:#E2EBEA; --muted:#97A9AD; --rule:#23373E; --rule-strong:#3B5660;
+  --swim:#58AACA; --bike:#E2B045; --run:#EA6553; --lift:#9AA6AB; --rest:#5D6E73; --heat:#D29A5E; --race:#E2EBEA;
+  --band1:#16282F; --band2:#1B2F37; --focus:#58AACA; --hl:#E2EBEA;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+a{color:inherit;text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+[hidden]{display:none!important}
+
+/* Masthead */
+.masthead{padding:28px 0 0;border-bottom:1px solid var(--rule)}
+.title-row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 24px}
+h1{margin:0;font-stretch:125%;font-weight:820;font-size:clamp(2.5rem,7.5vw,4.8rem);line-height:.92;letter-spacing:-.025em}
+.race-meta{margin:0;font-size:1.05rem;color:var(--muted);max-width:34ch}
+.race-meta strong{color:var(--ink);font-weight:650}
+.countdown{margin:14px 0 0;font-weight:600}
+.tabs{display:flex;gap:2px;margin-top:18px;overflow-x:auto;scrollbar-width:none}
+.tab{appearance:none;border:0;background:none;font:inherit;font-weight:620;padding:10px 14px 11px;color:var(--muted);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+
+/* Season profile */
+.profile{margin:26px 0 6px}
+.profile-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 20px;margin-bottom:8px}
+.profile-head h2{margin:0;font-size:1.05rem;font-weight:700}
+.legend{display:flex;gap:14px;font-size:.85rem;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px}
+.profile-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.profile svg{display:block;width:100%;min-width:700px;height:auto}
+.bar.swim{fill:var(--swim)} .bar.bike{fill:var(--bike)} .bar.run{fill:var(--run)}
+.hit{fill:transparent;cursor:pointer}
+.hit:hover{fill:var(--ink);fill-opacity:.05}
+.hit.sel{fill:var(--ink);fill-opacity:.08;stroke:var(--ink);stroke-width:1.5}
+.band.b1{fill:var(--band1)} .band.b2{fill:var(--band2)}
+.bandtxt{fill:var(--ink);font-size:11px;font-weight:600}
+.mon{fill:var(--muted);font-size:11px}
+.gridline{stroke:var(--rule);stroke-width:1}
+.gridtxt{fill:var(--muted);font-size:10px;paint-order:stroke;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round}
+.todayline{stroke:var(--ink);stroke-width:1.5;stroke-dasharray:3 3}
+.pole{stroke:var(--ink);stroke-width:1.5}
+.flag{fill:var(--run)}
+
+/* Week */
+.weeknav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:22px 0 14px}
+.btn{font:inherit;font-weight:620;font-size:.95rem;border:1px solid var(--rule-strong);background:var(--panel);color:var(--ink);border-radius:6px;padding:8px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:40px}
+.btn:hover{border-color:var(--ink)}
+.btn svg{width:16px;height:16px}
+.btn.quiet{background:none;border-color:transparent;color:var(--muted)}
+.btn.quiet:hover{color:var(--ink);border-color:var(--rule-strong)}
+select,input{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--rule-strong);border-radius:6px;padding:8px 10px;min-height:40px}
+.weekhead{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 28px;align-items:start;border-top:2px solid var(--ink);padding-top:14px}
+.weekhead h2{margin:0;font-stretch:118%;font-weight:780;font-size:clamp(1.5rem,3.4vw,2.1rem);line-height:1.1}
+.weekhead .dates{color:var(--muted);font-weight:500;font-stretch:100%;font-size:1rem;margin-left:6px}
+.phase-line{margin:4px 0 0;font-weight:600}
+.typepill{display:inline-block;margin-left:8px;padding:1px 9px;border-radius:999px;border:1px solid var(--rule-strong);font-size:.82rem;font-weight:600;vertical-align:2px}
+.typepill.recovery,.typepill.test{border-color:var(--swim);color:var(--swim)}
+.typepill.taper,.typepill.race{border-color:var(--run);color:var(--run)}
+.totals{display:grid;grid-template-columns:repeat(4,auto);gap:2px 20px;text-align:right;font-size:.92rem}
+.totals .lab{color:var(--muted);font-size:.8rem}
+.totals .val{font-weight:700;font-stretch:112%;font-size:1.15rem}
+.totals .k::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:1px;background:var(--c)}
+.why{grid-column:1/-1;max-width:78ch;color:var(--muted);margin:6px 0 0}
+.weeknote{grid-column:1/-1;max-width:78ch;margin:4px 0 0;padding:10px 14px;border-left:3px solid var(--run);background:var(--panel)}
+.progress{grid-column:1/-1;font-size:.88rem;color:var(--muted)}
+
+/* Day strip */
+.days{position:relative;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:18px 0 0}
+.daybtn{appearance:none;text-align:left;background:var(--panel);border:1px solid var(--rule);border-radius:8px 8px 0 0;border-bottom-width:3px;padding:10px 10px 8px;cursor:pointer;font:inherit;color:inherit;min-height:128px;display:flex;flex-direction:column;gap:6px}
+.daybtn:hover{border-color:var(--rule-strong)}
+.daybtn[aria-selected="true"]{border-color:var(--ink);border-bottom-color:var(--ink);background:var(--panel)}
+.daybtn .dn{font-weight:720;font-size:.95rem;line-height:1.1}
+.daybtn .dd{color:var(--muted);font-size:.82rem}
+.daybtn .todaytag{font-size:.72rem;font-weight:700;color:var(--run)}
+.mini{display:flex;flex-direction:column;gap:3px;margin-top:2px}
+.mini span{display:block;height:7px;border-radius:2px;background:var(--c);min-width:6px}
+.mini span.light{opacity:.45}
+.daybtn .tot{margin-top:auto;font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:4px}
+.daybtn .tot b{color:var(--ink);font-weight:650}
+
+/* Day detail */
+.daydetail{background:var(--panel);border:1px solid var(--ink);border-top-width:0;padding:14px 18px 20px;margin-bottom:36px}
+.dayhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.dayhead h3{margin:0;font-size:1.25rem;font-weight:720;font-stretch:110%}
+.dayhead .sum{color:var(--muted);font-size:.92rem;margin:2px 0 0}
+.dayctl{display:flex;gap:6px;flex-wrap:wrap}
+.sess{--c:var(--muted);border-left:4px solid var(--c);background:var(--paper);margin:12px 0 0;border-radius:0 6px 6px 0}
+.sport-swim{--c:var(--swim)} .sport-bike{--c:var(--bike)} .sport-run{--c:var(--run)} .sport-lift{--c:var(--lift)} .sport-rest{--c:var(--rest)} .sport-heat{--c:var(--heat)} .sport-race{--c:var(--race)}
+.sess-head{display:flex;align-items:stretch}
+.sess-check{display:flex;align-items:center;padding:0 4px 0 12px}
+.sess-check input{width:20px;height:20px;min-height:0;accent-color:var(--ink);margin:0;cursor:pointer}
+.sess-toggle{flex:1;display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:2px 14px;text-align:left;background:none;border:0;font:inherit;color:inherit;padding:12px 14px 12px 8px;cursor:pointer}
+.sess-title{font-weight:700;font-size:1.04rem;line-height:1.25}
+.sess-meta{display:flex;flex-wrap:wrap;gap:0;color:var(--muted);font-size:.86rem;margin-top:3px}
+.sess-meta span+span{border-left:1px solid var(--rule-strong);margin-left:9px;padding-left:9px}
+.sess-meta .keytag{color:var(--ink);font-weight:650}
+.sess-dur{font-weight:720;font-stretch:115%;font-size:1.15rem;white-space:nowrap}
+.chev{width:18px;height:18px;transition:transform .15s ease;color:var(--muted)}
+.sess-toggle[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.sess.done .sess-title{text-decoration:line-through;text-decoration-thickness:1px;color:var(--muted)}
+.sess-body{padding:2px 18px 18px 16px;border-top:1px solid var(--rule)}
+.sess-body .purpose{max-width:76ch;margin:12px 0 10px}
+.steps{display:grid;grid-template-columns:7.5rem minmax(0,1fr) minmax(10rem,15rem);border-top:1px solid var(--rule);font-size:.94rem}
+.steps>div{padding:9px 10px 9px 0;border-bottom:1px solid var(--rule)}
+.steps .h{font-size:.8rem;font-weight:650;color:var(--muted);padding-top:7px;padding-bottom:6px}
+.steps .part{font-weight:650}
+.steps .n{color:var(--muted);font-size:.88rem;margin-top:3px}
+.steps .tz{font-weight:600;font-size:.86rem}
+.steps .tv{font-weight:700}
+.steps .ts{color:var(--muted);font-size:.84rem}
+.notes{margin:12px 0 0;padding-left:1.1rem;max-width:76ch;color:var(--muted);font-size:.92rem}
+.notes li+li{margin-top:4px}
+.method{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px;font-size:.85rem;color:var(--muted)}
+.chip{border:1px solid var(--rule-strong);border-radius:999px;padding:1px 10px;color:var(--ink);font-size:.82rem}
+.empty{color:var(--muted);margin:14px 0 0}
+
+/* Panels for other tabs */
+.page{padding:30px 0 60px}
+.page h2{font-stretch:118%;font-weight:780;font-size:clamp(1.5rem,3.4vw,2.1rem);margin:0 0 6px;line-height:1.1}
+.page h3{font-size:1.15rem;margin:32px 0 6px;font-weight:720}
+.page p,.page li{max-width:74ch}
+.lede{color:var(--muted);font-size:1.05rem;max-width:70ch;margin-top:0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px 36px;margin-top:20px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:14px}
+.field label{font-weight:650;font-size:.95rem}
+.field .hint{color:var(--muted);font-size:.85rem}
+.inline{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.inline input,.inline select{width:auto;flex:1 1 110px;min-width:0}
+.calc{border-left:3px solid var(--rule-strong);padding:4px 0 4px 14px;margin:6px 0 18px}
+.calc .res{font-size:.9rem;color:var(--muted);margin-top:6px}
+table.z{border-collapse:collapse;width:100%;font-size:.92rem;margin-top:8px}
+table.z th,table.z td{text-align:left;padding:7px 10px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+table.z th{font-size:.8rem;color:var(--muted);font-weight:650}
+table.z td:first-child{font-weight:600}
+.tablewrap{overflow-x:auto}
+.coach{border-top:2px solid var(--ink);padding-top:12px;margin-top:30px}
+.coach h3{margin:0 0 2px}
+.coach .who{color:var(--muted);margin:0 0 10px;font-size:.95rem}
+.coach .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:4px 32px}
+.coach h4{margin:8px 0 4px;font-size:.95rem}
+.coach ul{margin:0;padding-left:1.1rem}
+.coach li{margin-bottom:5px}
+.budget{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:2px solid var(--ink);margin-top:14px}
+.budget div{padding:10px 10px 12px 0;border-bottom:1px solid var(--rule)}
+.budget .l{font-size:.85rem;color:var(--muted)}
+.budget .v{font-stretch:118%;font-weight:780;font-size:1.6rem;line-height:1.1}
+.budget .s{font-size:.82rem;color:var(--muted)}
+.callout{border-left:3px solid var(--run);background:var(--panel);padding:12px 16px;margin:16px 0;max-width:78ch}
+.sources li{margin-bottom:6px}
+.savednote{font-size:.85rem;color:var(--muted)}
+
+@media (max-width:820px){
+  .weekhead{grid-template-columns:1fr}
+  .totals{text-align:left;grid-template-columns:repeat(4,auto);justify-content:start}
+  .steps{grid-template-columns:6rem minmax(0,1fr)}
+  .steps .tgt{grid-column:2;padding-top:0}
+  .steps .h.tgt{display:none}
+}
+@media (max-width:760px){
+  .days{grid-template-columns:repeat(7,92px);overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+  .daybtn{min-height:104px}
+  .daydetail{padding:12px 12px 18px}
+  .sess-toggle{grid-template-columns:minmax(0,1fr) auto;padding-right:10px}
+  .chev{display:none}
+  .budget{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:480px){
+  .steps{grid-template-columns:1fr}
+  .steps .h{display:none}
+  .steps>div{padding-right:0}
+  .steps .part{padding-bottom:0;border-bottom:0;padding-top:12px}
+  .steps .det{padding-top:2px;border-bottom:0}
+  .steps .tgt{grid-column:1;padding-top:2px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <div class="title-row">
+      <h1>Weymouth 70.3</h1>
+      <p class="race-meta"><strong>Sunday 12 September 2027.</strong> Goal: under 5 hours 30. 48 weeks, 14 hours of swim, bike and run a week, plus three lifting slots.</p>
+    </div>
+    <p class="countdown" id="countdown"></p>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button class="tab" role="tab" id="tab-plan" aria-controls="view-plan" aria-selected="true">Plan</button>
+      <button class="tab" role="tab" id="tab-numbers" aria-controls="view-numbers" aria-selected="false">Your numbers</button>
+      <button class="tab" role="tab" id="tab-race" aria-controls="view-race" aria-selected="false">Race day</button>
+      <button class="tab" role="tab" id="tab-method" aria-controls="view-method" aria-selected="false">Method and sources</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- PLAN -->
+  <section id="view-plan" role="tabpanel" aria-labelledby="tab-plan">
+    <div class="profile">
+      <div class="profile-head">
+        <h2>The season: weekly hours by sport. Click a week to open it.</h2>
+        <div class="legend"><span><i style="background:var(--swim)"></i>Swim</span><span><i style="background:var(--bike)"></i>Bike</span><span><i style="background:var(--run)"></i>Run</span></div>
+      </div>
+      <div class="profile-scroll"><svg id="profile" viewBox="0 0 960 222" role="img" aria-label="Weekly training hours across the 48-week season"></svg></div>
+    </div>
+
+    <div class="weeknav">
+      <button class="btn" id="prevWeek" aria-label="Previous week"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Prev week</button>
+      <label class="sr" for="weekSel" style="position:absolute;left:-9999px">Choose week</label>
+      <select id="weekSel"></select>
+      <button class="btn" id="nextWeek" aria-label="Next week">Next week<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+      <button class="btn quiet" id="todayBtn">Go to today</button>
+    </div>
+
+    <div class="weekhead" id="weekhead"></div>
+    <div class="days" id="days" role="tablist" aria-label="Days of the week"></div>
+    <div class="daydetail" id="daydetail" role="tabpanel">
+      <div class="dayhead">
+        <div><h3 id="dayTitle"></h3><p class="sum" id="daySum"></p></div>
+        <div class="dayctl">
+          <button class="btn" id="prevDay" aria-label="Previous day"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Prev day</button>
+          <button class="btn" id="nextDay" aria-label="Next day">Next day<svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+          <button class="btn quiet" id="expandAll">Expand all</button>
+        </div>
+      </div>
+      <div id="sessions"></div>
+    </div>
+  </section>
+
+  <!-- NUMBERS -->
+  <section id="view-numbers" class="page" role="tabpanel" aria-labelledby="tab-numbers" hidden>
+    <h2>Your numbers</h2>
+    <p class="lede">Enter your test results and every session in the plan shows real targets: watts, run paces and swim paces instead of percentages. Update them after each benchmark week (weeks 9, 19, 27, 35 and 43). They are saved in this browser.</p>
+    <div class="cols">
+      <div>
+        <h3>Bike: FTP</h3>
+        <div class="field"><label for="ftp">FTP (watts)</label><input id="ftp" type="number" inputmode="numeric" min="80" max="500" placeholder="e.g. 230"><span class="hint">From the ramp test or 20-minute test.</span></div>
+        <div class="calc"><div class="field" style="margin:0"><label for="p20">Or: 20-minute test average power</label><div class="inline"><input id="p20" type="number" inputmode="numeric" placeholder="e.g. 245"><button class="btn" id="useP20">Use 95% as FTP</button></div></div></div>
+
+        <h3>Run: threshold pace</h3>
+        <div class="field"><label for="tpace">Threshold pace (min:sec per km)</label><input id="tpace" type="text" inputmode="numeric" placeholder="e.g. 4:35"><span class="hint">Roughly the pace you could race for one hour.</span></div>
+        <div class="calc"><div class="field" style="margin:0"><label for="rdist">Or work it out from a recent race</label><div class="inline"><select id="rdist"><option value="5">5 km</option><option value="10">10 km</option><option value="21.0975" selected>Half marathon</option></select><input id="rtime" type="text" inputmode="numeric" placeholder="h:mm:ss"><button class="btn" id="useRace">Use this</button></div><p class="res" id="raceRes">Your 11 October half is the obvious one to use.</p></div></div>
+      </div>
+      <div>
+        <h3>Swim: CSS</h3>
+        <div class="field"><label for="css">CSS (min:sec per 100 m)</label><input id="css" type="text" inputmode="numeric" placeholder="e.g. 2:05"><span class="hint">Critical swim speed: your swim threshold.</span></div>
+        <div class="calc"><div class="field" style="margin:0"><label>Or work it out from the test</label><div class="inline"><select id="cssA" aria-label="Longer test distance"><option value="400" selected>400 m</option><option value="200">200 m</option></select><input id="cssTA" type="text" inputmode="numeric" placeholder="time m:ss" aria-label="Longer test time"></div><div class="inline" style="margin-top:6px"><select id="cssB" aria-label="Shorter test distance"><option value="200" selected>200 m</option><option value="100">100 m</option></select><input id="cssTB" type="text" inputmode="numeric" placeholder="time m:ss" aria-label="Shorter test time"><button class="btn" id="useCss">Use this</button></div><p class="res">If 400 m continuous isn't there yet in week 1, use 200 m and 100 m.</p></div></div>
+
+        <h3>Heart rate (optional)</h3>
+        <div class="field"><label for="hrmax">Max heart rate (bpm)</label><input id="hrmax" type="number" inputmode="numeric" min="140" max="220" placeholder="e.g. 188"><span class="hint">Adds heart-rate ranges to every target. Use the highest you've actually seen, not 220 minus age.</span></div>
+        <p class="savednote" id="savedNote"></p>
+      </div>
+    </div>
+    <h3>Your zones</h3>
+    <div class="tablewrap"><table class="z" id="zoneTable"></table></div>
+    <p class="savednote">Bike and swim zones follow standard FTP and CSS bands. The sub-threshold zones follow the "Norwegian lite" ranges: medium at about 80–85% FTP or 80–84% max HR, hard at 86–90% FTP or 85–87% max HR.</p>
+  </section>
+
+  <!-- RACE -->
+  <section id="view-race" class="page" role="tabpanel" aria-labelledby="tab-race" hidden>
+    <h2>Race day</h2>
+    <p class="lede">The sub-5:30 budget, your targets from your numbers, and how to pace, fuel and taper.</p>
+    <h3>The sub-5:30 budget</h3>
+    <div class="budget">
+      <div><div class="l">Swim 1.9 km</div><div class="v">0:44</div><div class="s">about 2:19 per 100 m</div></div>
+      <div><div class="l">T1</div><div class="v">0:05</div><div class="s">beach to bike</div></div>
+      <div><div class="l">Bike 90 km</div><div class="v">2:50</div><div class="s">about 31.8 km/h on a rolling course</div></div>
+      <div><div class="l">T2</div><div class="v">0:03</div><div class="s"></div></div>
+      <div><div class="l">Run 21.1 km</div><div class="v">1:47</div><div class="s">about 5:04 per km</div></div>
+    </div>
+    <p>That adds up to 5:29. The bike is where most of the time sits and where most of the improvement will come from, because you're starting it from almost nothing. The swim mostly needs to be calm and efficient: it's the leg with the least time to gain and the most energy to waste.</p>
+
+    <h3>Your targets</h3>
+    <div id="raceTargets"></div>
+
+    <h3>Pacing</h3>
+    <ul>
+      <li><strong>Bike:</strong> 70.3 racing sits between your two thresholds, near the top of that band for a race this length. Hold race power, allow the top of race intensity on climbs, never threshold. The first 15 minutes stay below race power while your heart rate settles.</li>
+      <li><strong>Run:</strong> first 3 km at the slow end of race pace even though it'll feel easy. Hold race pace to 16 km, then race whatever is left.</li>
+      <li><strong>The classic error:</strong> racing harder than you've trained. Every key session from June rehearses the exact intensity you'll race at, so the race should feel familiar, not heroic.</li>
+    </ul>
+
+    <h3>Fuelling</h3>
+    <ul>
+      <li>Breakfast you've tested, about 3 hours before: 100–150 g carbohydrate, low fibre.</li>
+      <li>Bike: 60–90 g carbohydrate and 500–750 ml fluid per hour, starting 10 minutes in. You'll have practised this on every long ride since October.</li>
+      <li>Run: a gel or cola at aid stations from 5 km, aiming for 40–60 g per hour.</li>
+      <li>Train with the drink and gels you'll race with from June onwards. Check the athlete guide for the on-course brand.</li>
+    </ul>
+
+    <h3>The course</h3>
+    <ul>
+      <li>Single-lap sea swim in Weymouth Bay, with a self-seeded rolling start. Seed yourself honestly by goal time.</li>
+      <li>One-lap bike into the rolling Dorset countryside. Reported climbing varies from about 800 m to about 1,000 m: rolling rather than mountainous, with long open stretches where clip-on aero bars pay off.</li>
+      <li>Flat run along the seafront in laps. The lap count has changed between years, so check the athlete guide and count laps from your watch.</li>
+      <li>Week 41 has a course recce ride built in. Weymouth is under two hours from Bristol.</li>
+    </ul>
+
+    <h3>Taper</h3>
+    <p>Week 46 drops to about 75–80% of peak volume, week 47 to about 55%, race week to about a third. Intensity stays in every week: race-pace work keeps you sharp, the reduced volume lets fatigue clear. Lifting drops to light sessions, then mobility only in race week.</p>
+
+    <h3>The August Olympic-distance race</h3>
+    <div class="callout">
+      <p style="margin-top:0">If you confirm a London Olympic-distance race, the best home for it is <strong>week 43 (2–8 August)</strong>, which is already a recovery week, so it becomes the mini-taper. Late July works too. Avoid anything after about 22 August: too close to Weymouth.</p>
+      <p style="margin-bottom:0">It gets treated as a real race, not a training day: two or three lighter days before, three or four easy days after. Send me the date when you have it and I'll rework the weeks around it.</p>
+    </div>
+
+    <h3>Kit the plan assumes</h3>
+    <ul>
+      <li>A smart trainer or power meter. Most winter bike sessions are written for indoors, and power is how the threshold work gets controlled. Heart rate and effort work as a fallback.</li>
+      <li>Clip-on aero bars and a basic bike fit on the road bike, ideally before February.</li>
+      <li>A wetsuit by May for open water, and a tow float.</li>
+      <li>A chest heart-rate strap, and optionally an HRV app or watch for the morning readiness check.</li>
+    </ul>
+  </section>
+
+  <!-- METHOD -->
+  <section id="view-method" class="page" role="tabpanel" aria-labelledby="tab-method" hidden>
+    <h2>Method and sources</h2>
+    <p class="lede">Four coaching philosophies, one plan. Where they agree (lots of easy volume, consistency, controlled intensity, slow progression) the plan follows all of them. Where they differ, it picks by phase.</p>
+
+    <h3>Starting point the plan is built for</h3>
+    <ul>
+      <li>A runner doing 30–50 km a week, coming off a half marathon on 11 October 2026.</li>
+      <li>Not yet able to swim 1.5 km freestyle continuously, so the swim gets the most technical attention early.</li>
+      <li>Owns a road bike but rarely rides, so bike volume ramps from low and never jumps.</li>
+      <li>14 hours a week of swim, bike and run as a ceiling, not a starting point. Lifting sits on top.</li>
+      <li>Swims every Monday, Wednesday and Friday. Lifting slots are reserved on the same days, straight after the swim, so it's one trip.</li>
+    </ul>
+
+    <div class="coach">
+      <h3>Dan Lorang</h3>
+      <p class="who">Coach to Jan Frodeno, Anne Haug and Lucy Charles-Barclay; head of performance at Red Bull–Bora–Hansgrohe.</p>
+      <div class="two">
+        <div><h4>What he does</h4><ul>
+          <li>Periodises in repeating phases: technique and VO2max first, then strength and endurance, then "economisation" with race-pace intervals close to competition. The cycle repeats two or three times a year.</li>
+          <li>Run: hill reps for VO2max; long uphill runs at low intensity for strength (he uses 4–5 × 2 km); long runs alternating 1 km at race pace with 1 km easy late in the build.</li>
+          <li>Treats VO2max work as a controlled intensity, not sprinting, and keeps the rest of training easy.</li>
+          <li>Tests inside training with repeatable sessions such as 8 × 1 km rather than stopping to test.</li>
+          <li>Slow, healthy progression. Frodeno credits him with slowing him down, and the consistency that followed.</li>
+          <li>Races are never training sessions.</li></ul></div>
+        <div><h4>Where it shows up</h4><ul>
+          <li>The whole phase structure: phases 1–2, then the cycle again in phases 3–5.</li>
+          <li>Hill reps on Thursdays in phase 1; long uphill reps in phases 2 and 4.</li>
+          <li>Alternating race-pace kilometres in the phase 5 long runs.</li>
+          <li>The 8 × 1 km benchmark in every test week.</li>
+          <li>The August race, if it happens, gets a real taper.</li></ul></div>
+      </div>
+    </div>
+
+    <div class="coach">
+      <h3>Dr Dan Plews</h3>
+      <p class="who">Sports scientist (PhD in heart-rate variability), coach, Kona age-group course record holder and the fastest age-group Ironman on record.</p>
+      <div class="two">
+        <div><h4>What he does</h4><ul>
+          <li>Points out that Ironman and 70.3 racing happen mostly at moderate intensity, between the two thresholds, and 70.3 sits near the top of that band.</li>
+          <li>So the intensity mix should span polarised (roughly 80/20) early in the season and pyramidal (more moderate work) as race day nears.</li>
+          <li>Uses low-cadence (60–75 rpm), moderate-intensity bike intervals for threshold power.</li>
+          <li>Monitors readiness with HRV; has published on heat training and intensity distribution.</li>
+          <li>Does much of his own training indoors for time efficiency.</li></ul></div>
+        <div><h4>Where it shows up</h4><ul>
+          <li>The target intensity mix by phase (table below).</li>
+          <li>Low-cadence intervals in phase 2, at race power in phase 4.</li>
+          <li>The readiness rule below.</li>
+          <li>Indoor-friendly winter sessions.</li></ul></div>
+      </div>
+    </div>
+
+    <div class="coach">
+      <h3>Lance Watson</h3>
+      <p class="who">Founder of LifeSport Coaching; has coached Olympic and Ironman champions, and specialises in time-limited age-groupers.</p>
+      <div class="two">
+        <div><h4>What he does</h4><ul>
+          <li>Treats November to January as a "shoulder season" for skills (including single-leg pedalling drills at 70–90 rpm) before base training proper.</li>
+          <li>Uses three kinds of 70.3 brick: bike-emphasis, run-emphasis and race simulation. His half-ironman bricks combine 20-minute race-intensity blocks, 6 × 3 min at 60–70 rpm late in the ride, then a run at race pace.</li>
+          <li>In the final 6–8 weeks: runs off the bike at goal pace (for example 30 min at goal pace plus 15 easy) and 4 × 1 mile 10–15 s faster than goal pace; race fuelling dialled in.</li>
+          <li>Warns that the most common 70.3 error is racing harder than you trained.</li></ul></div>
+        <div><h4>Where it shows up</h4><ul>
+          <li>Pedalling skills and swim technique focus in phase 1.</li>
+          <li>Tuesday runs off the bike from phase 2 onwards.</li>
+          <li>Watson bricks A and B on phase 5 Saturdays, the race simulation and the dress rehearsal.</li>
+          <li>Thursday mile repeats in phase 5; fuelling practice on every long ride.</li></ul></div>
+      </div>
+    </div>
+
+    <div class="coach">
+      <h3>Olav Aleksander Bu and Kristian Blummenfelt</h3>
+      <p class="who">The Norwegian method: Olympic, Ironman and 70.3 world titles.</p>
+      <div class="two">
+        <div><h4>What they do</h4><ul>
+          <li>High volume at low intensity, plus a lot of work between LT1 and LT2, which makes the model pyramidal rather than polarised. Intensity is controlled tightly, originally by blood lactate.</li>
+          <li>Double-threshold days at the elite end; 25–35 hour weeks for Blummenfelt.</li>
+          <li>Blummenfelt's running, as analysed by Alan Couzens: mostly short, frequent easy runs with a key session every few days, including tempo rolling into threshold inside a long run.</li>
+          <li>A heat block early in the season, then a few heat sessions a week to maintain it. Blummenfelt says it helps even in cool races.</li>
+          <li>Bu himself has said they could drop much of their technology and still get to the same place.</li></ul></div>
+        <div><h4>Where it shows up</h4><ul>
+          <li>Phase 3 sub-threshold intervals on bike and run, with power and heart-rate ceilings standing in for lactate.</li>
+          <li>Frequent easy runs with strides and hill sprints.</li>
+          <li>Tempo-to-threshold blocks inside two phase 3 long runs.</li>
+          <li>The heat block in weeks 37–38 and maintenance to week 46.</li></ul></div>
+      </div>
+    </div>
+
+    <h3>What's deliberately left out</h3>
+    <ul>
+      <li><strong>Double-threshold days.</strong> The principle underneath them is accumulating more controlled threshold time. At 14 hours with a young bike engine, spreading it across the week does that with less risk.</li>
+      <li><strong>Lactate testing.</strong> Power, pace and heart-rate ceilings do the same job well enough for an age-grouper.</li>
+      <li><strong>Plews' low-carbohydrate race fuelling.</strong> He's an advocate, but for a first 70.3 at this duration, a standard high-carbohydrate plan that you've practised is the safer bet.</li>
+    </ul>
+
+    <h3>Target intensity mix by phase</h3>
+    <div class="tablewrap"><table class="z" id="phaseTable"></table></div>
+
+    <h3>The readiness rule</h3>
+    <p>Each morning, take your HRV (watch or app) and note how you feel. If your 7-day average sits below your normal range for two days or more and you feel flat, swap that day's key session for easy endurance at the same duration. Don't try to make it up later. Missed sessions are cheap; digging a hole in week 30 is expensive.</p>
+
+    <h3>Sources</h3>
+    <ul class="sources">
+      <li><a href="https://www.220triathlon.com/training/long-distance/frodeno-and-haugs-coach-dan-lorang-on-how-to-train-for-ironman" target="_blank" rel="noopener">220 Triathlon: Frodeno and Haug's coach Dan Lorang on how to train for Ironman</a></li>
+      <li><a href="https://www.bennettendurance.com/post/dan-lorang-coach-to-jan-frodeno-lucy-charles-barclay-anne-haug-the-bora-hansgrohe-cycling-team" target="_blank" rel="noopener">Bennett Endurance podcast: Dan Lorang episode notes</a></li>
+      <li><a href="https://www.trizone.com.au/polarised-to-pyramidal-training-intensity-distributions-the-principle-of-specificity-is-key/" target="_blank" rel="noopener">Dan Plews: Polarised to pyramidal training intensity distribution</a></li>
+      <li><a href="https://www.zwift.com/uk/news/18379-tips-and-tricks-to-za-tri-2020-workouts" target="_blank" rel="noopener">Zwift Academy Tri: Dan Plews on the workouts</a></li>
+      <li><a href="https://www.trainingpeaks.com/blog/skill-improvement-for-triathletes-during-the-off-season/" target="_blank" rel="noopener">Lance Watson: Skill improvement for triathletes during the off-season</a></li>
+      <li><a href="https://www.trainingpeaks.com/blog/5-ways-to-become-a-stronger-long-course-runner/" target="_blank" rel="noopener">Lance Watson: 5 ways to become a stronger long-course runner</a></li>
+      <li><a href="https://coachray.nz/2023/10/23/monday-brick-lance-watsons-half-ironman-brick-b" target="_blank" rel="noopener">Lance Watson's half-ironman bricks (via Coach Ray)</a></li>
+      <li><a href="https://www.triathlete.com/training/how-to-train-like-a-norwegian-without-the-blood/" target="_blank" rel="noopener">Triathlete: How to train like a Norwegian (without the blood)</a></li>
+      <li><a href="https://www.triathlete.com/training/the-training-secrets-behind-the-norwegians-phenomenal-ironman-debuts/" target="_blank" rel="noopener">Triathlete: The training secrets behind the Norwegians' Ironman debuts</a></li>
+      <li><a href="https://corebodytemp.com/blogs/news/kristian-blummenfelt-reveals-how-he-uses-the-core-sensor" target="_blank" rel="noopener">CORE: Kristian Blummenfelt on heat training</a></li>
+      <li><a href="https://www.trainingpeaks.com/blog/the-norwegian-training-method/" target="_blank" rel="noopener">TrainingPeaks: The Norwegian training method simplified</a></li>
+    </ul>
+  </section>
+</main>
+<script>
+/*PLAN-START*/
+"use strict";
+const PLAN_START = [2026, 9, 12]; // Monday 12 October 2026
+function dateOf(w, d){ return new Date(PLAN_START[0], PLAN_START[1], PLAN_START[2] + (w-1)*7 + d); }
+const N = {ftp:null, tpace:null, css:null, hrmax:null};
+
+function fmtDur(min){ if(min < 60) return min + " min"; const h=Math.floor(min/60), m=min%60; return h + ":" + String(m).padStart(2,"0"); }
+function fmtHM(min){ const h=Math.floor(min/60), m=Math.round(min%60); return h + ":" + String(m).padStart(2,"0"); }
+function fmtPace(s){ s=Math.round(s); return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0"); }
+
+/* ---------------- Zones ---------------- */
+const Z = {
+  rec:  {name:"Recovery", rpe:"1–2", hr:[55,68]},
+  z2:   {name:"Endurance (below LT1)", rpe:"2–3", hr:[65,78]},
+  lt1:  {name:"Steady (around LT1)", rpe:"3–4", hr:[78,81]},
+  race: {name:"70.3 race intensity", rpe:"4–6", hr:[80,86]},
+  rfast:{name:"Faster than race pace", rpe:"6", hr:[85,88]},
+  nt1:  {name:"Sub-threshold, medium", rpe:"4–5", hr:[80,84]},
+  nt2:  {name:"Sub-threshold, hard", rpe:"5–6", hr:[85,87]},
+  thr:  {name:"Threshold (LT2)", rpe:"7", hr:[87,91]},
+  vo2:  {name:"VO2max, controlled", rpe:"8–9", hr:[92,97]},
+  lc:   {name:"Low-cadence strength", rpe:"5–6", hr:[78,86]},
+  hill: {name:"Hill reps", rpe:"8", hr:[88,95]},
+  drill:{name:"Technique", rpe:""},
+  fast: {name:"Fast and relaxed", rpe:"8"}
+};
+const BIKE = {rec:[40,55], z2:[56,72], lt1:[72,78], race:[78,84], nt1:[80,85], nt2:[86,90], thr:[95,100], vo2:[106,118], lc:[80,88]};
+const RUN  = {rec:[1.36,1.50], z2:[1.20,1.32], lt1:[1.12,1.18], race:[1.08,1.12], rfast:[1.05,1.075], nt1:[1.05,1.09], nt2:[1.01,1.04], thr:[0.98,1.01], vo2:[0.90,0.94]};
+const SWIM = {rec:[12,18], z2:[6,10], race:[3,6], thr:[-1,2], vo2:[-6,-3], fast:[-8,-4]};
+const RUNDESC = {
+  rec:"Very easy jog", z2:"Conversational: full sentences", lt1:"Steady: short sentences", race:"Your 70.3 goal pace",
+  rfast:"10–15 s per mile quicker than 70.3 pace", nt1:"Comfortably hard: about marathon pace", nt2:"About half-marathon pace",
+  thr:"About one-hour race pace", vo2:"3–5 km race pace", hill:"Hard but controlled, 8/10", fast:"Quick and relaxed, not a sprint"
+};
+
+/* ---------------- Phases ---------------- */
+const PHASES = [
+  {id:0, name:"Transition", label:"", from:1, to:1, mix:"Mostly easy",
+   why:"The week after your half marathon. Legs recover, you get in the pool, and you collect baseline numbers so every session after this has real targets."},
+  {id:1, name:"Phase 1: Skill and aerobic foundation", label:"Skill and aerobic", from:2, to:9, mix:"About 85% easy, 5% moderate, 10% hard (polarised)",
+   why:"Lorang starts each cycle with technique and VO2max; Watson treats early winter as the season for learning skills. So swimming leads: technique three times a week and steadily extending how far you can swim without stopping. Bike volume ramps gently from almost nothing. The intensity mix is polarised, as Plews suggests for early season: nearly everything below LT1, with small doses of controlled VO2 work."},
+  {id:2, name:"Phase 2: Strength-endurance", label:"Strength-endurance", from:10, to:19, mix:"About 80 / 12 / 8",
+   why:"Lorang's second phase: strength and endurance. Low-cadence bike intervals at moderate power (a Plews favourite for threshold gains), long uphill runs at low intensity (Lorang's 4–5 × 2 km), paddles and longer continuous swims in the pool. Heavy lifting peaks here while endurance intensity stays low. Swim milestone: 1,900 m continuous by mid-February."},
+  {id:3, name:"Phase 3: Threshold, Norwegian-lite", label:"Threshold", from:20, to:27, mix:"About 72 / 22 / 6 (shifting pyramidal)",
+   why:"The spirit of Bu's Norwegian method without the finger-pricking: controlled intervals between LT1 and LT2, short recoveries, a hard ceiling. No double-threshold days: with 14 hours and a young bike engine, the gain is in stacking controlled threshold time week after week. The mix shifts from polarised towards pyramidal."},
+  {id:4, name:"Phase 4: Strength-endurance outdoors", label:"Outdoors", from:28, to:35, mix:"About 72 / 23 / 5 (pyramidal)",
+   why:"Lorang's cycle repeats, shorter, and moves outside: long hilly rides with climbs at race intensity, low-cadence work at race power, uphill run reps finishing at race pace, and open water from late May once the lakes are warm enough."},
+  {id:5, name:"Phase 5: Race-specific", label:"Race-specific", from:36, to:45, mix:"About 65 / 30 / 5 (pyramidal)",
+   why:"Lorang's economisation phase plus Watson's 70.3 bricks. Every key session rehearses race intensity: race-pace runs off the bike, race-pace kilometres inside long runs, race fuelling on every long ride. Plews' pyramidal mix: more time at race intensity, less above threshold. A two-week heat block (Blummenfelt's approach) raises plasma volume, which helps even in a cool September race."},
+  {id:6, name:"Taper and race", label:"Taper", from:46, to:48, mix:"Volume down, intensity kept",
+   why:"Volume comes down by roughly a quarter, then by half; intensity stays. Nothing you do now adds fitness. The job is to arrive fresh and practised."}
+];
+function phaseOf(w){ return PHASES.find(p => w >= p.from && w <= p.to); }
+const RECOVERY = [5,11,15,23,31,39];
+const TESTS = [9,19,27,35,43];
+function typeOf(w){
+  if(w===1) return "transition"; if(w===48) return "race"; if(w===46||w===47) return "taper";
+  if(TESTS.includes(w)) return "test"; if(RECOVERY.includes(w)) return "recovery"; return "load";
+}
+const TYPE_LABEL = {load:"Load week", recovery:"Recovery week", test:"Recovery and benchmark week", transition:"Transition week", taper:"Taper", race:"Race week"};
+const TYPE_WHY = {
+  load:"",
+  recovery:"Recovery week: about a third less volume and one small touch of the phase's intensity. Don't fill the space with extra sessions; this is when the last three weeks turn into fitness.",
+  test:"Recovery week with benchmarks. After the tests, update the Your numbers tab so the next block's targets are right.",
+  transition:"", taper:"", race:""
+};
+const KMAP = {1:[2,3,4,6,7,8], 2:[10,12,13,14,16,17,18], 3:[20,21,22,24,25,26], 4:[28,29,30,32,33,34], 5:[36,37,38,40,41,42,44,45]};
+function kOf(w){ const p=phaseOf(w); const a=KMAP[p.id]; return a ? a.indexOf(w) : -1; }
+
+const WEEKNOTES = {
+  1:"Plan starts the Monday after your half marathon on 11 October. Low volume on purpose.",
+  11:"Christmas week. Friday's swim and lift move to Christmas Eve; Christmas Day is off. Pool hours will be odd, so swap days freely this week.",
+  12:"New Year's Day is Friday: if your pool is shut, swim Thursday or Saturday instead.",
+  37:"Heat block starts: sauna or hot bath after five sessions this week and next. See the heat items for how.",
+  41:"Course recce on Saturday. Weymouth is under two hours from Bristol: worth the trip.",
+  43:"Possible window for the London Olympic-distance race. If it lands this weekend, this recovery week becomes its mini-taper. Send me the confirmed date and I'll rework weeks 42–44. Like Lorang's athletes, you'd race it properly, not use it as training.",
+  44:"Race simulation on Saturday, with an open-water swim before the ride. Friday's swim is short and easy to make room.",
+  45:"Dress rehearsal on Saturday: last big session before the taper.",
+  48:"Race week. Lifting slots drop to mobility and activation only."
+};
+
+/* ---------------- Builders ---------------- */
+function S(sport, title, min, o){ return Object.assign({sport, title, min, key:false, z:null, m:null, purpose:"", steps:[], notes:[], src:[]}, o||{}); }
+function st(s, x, z, n){ return {s, x, z:z||null, n:n||""}; }
+
+/* Lifting */
+const LIFTLIB = {
+  found:{intent:"foundation: moderate weights, higher reps, good movement",
+    why:"Rebuilds tissue tolerance and movement quality before anything heavy. Moderate weight, controlled reps.",
+    A:{t:"Strength A: foundation", min:45, ex:[["Squat","Goblet squat 3 × 10, 2 s on the way down"],["Hinge","Romanian deadlift 3 × 10"],["Single leg","Rear-foot-elevated split squat 2 × 8 each leg"],["Push","Push-up 3 × 10–15"],["Pull","One-arm dumbbell row 3 × 10 each arm"],["Trunk","Dead bug 3 × 8 each side"]]},
+    B:{t:"Strength B: foundation", min:45, ex:[["Single leg","Step-up to knee height 3 × 8 each leg"],["Hinge","Single-leg RDL 3 × 8 each leg"],["Glutes","Hip thrust 3 × 12"],["Pull","Lat pulldown or assisted pull-up 3 × 10"],["Press","Half-kneeling landmine press 3 × 8 each arm"],["Trunk","Side plank 3 × 30 s each side"]]},
+    C:{t:"Prehab and mobility", min:30, ex:[["Lower leg","Calf raises 3 × 15 straight-knee and 3 × 15 bent-knee; tibialis raises 2 × 15"],["Adductors","Copenhagen plank 3 × 20 s each side"],["Shoulders","Band external rotation 2 × 15 and band pull-aparts 2 × 15 (swimmer's shoulders)"],["Hips","Hip airplanes 2 × 5 each side; 90/90 switches 2 × 8"],["Upper back","Open books 2 × 8 each side"]]}},
+  max:{intent:"heavy, low reps (3–6) on the main lifts",
+    why:"Heavy, low-rep strength through the winter. Heavy strength work improves cycling and running economy in endurance athletes, and winter is when you can afford the soreness.",
+    A:{t:"Strength A: heavy lower and pull", min:50, ex:[["Main lift","Back squat or trap-bar deadlift 4 × 4–6 at RPE 8, 2–3 min rest"],["Single leg","Bulgarian split squat 3 × 6 each leg, heavy"],["Calves","Weighted single-leg calf raise 3 × 10 each"],["Pull","Pull-up (add weight if easy) 4 × 5–8"],["Trunk","Pallof press 3 × 10 each side"]]},
+    B:{t:"Strength B: heavy hinge and press", min:50, ex:[["Main lift","Deadlift (conventional or trap-bar) 4 × 4–5 at RPE 8"],["Single leg","Heavy step-up 3 × 6 each leg"],["Glutes","Hip thrust 3 × 8"],["Press","Dumbbell bench or overhead press 3 × 6–8"],["Trunk","Hanging knee raise 3 × 10"]]},
+    C:{t:"Prehab, mobility and first plyos", min:30, ex:[["Plyo","Pogo hops 3 × 20: stiff ankles, quick contacts"],["Lower leg","Calf raises and tibialis raises as before"],["Adductors","Copenhagen plank 3 × 25 s each side"],["Shoulders","Band external rotation, then Y-T-W raises 2 × 10"],["Hips","Hip airplanes and 90/90 switches"]]}},
+  power:{intent:"fewer, faster reps plus plyometrics",
+    why:"Turns winter strength into power: fewer, faster reps with jumps. Volume comes down as endurance load goes up.",
+    A:{t:"Strength A: squat and jumps", min:45, ex:[["Main lift","Back squat 3 × 3–5 at RPE 7–8, fast on the way up"],["Contrast","Box jump 3 × 5 after each squat set; step down, don't jump down"],["Single leg","Split squat 2 × 6 each leg"],["Pull","Pull-up 3 × 6"],["Trunk","Ab wheel or dead bug 3 × 8"]]},
+    B:{t:"Strength B: hinge and bounds", min:45, ex:[["Main lift","Trap-bar deadlift 3 × 3–5 at RPE 7–8"],["Plyo","Bounding 3 × 6 each leg, or skips for height 3 × 20 m"],["Single leg","Single-leg RDL 2 × 6 each leg"],["Press","Overhead press 3 × 6"],["Trunk","Side plank with reach-through 2 × 8 each side"]]},
+    C:{t:"Prehab and mobility", min:30, ex:[["Plyo","Pogo hops 3 × 20"],["Lower leg","Calf and tibialis raises 2 × 15"],["Adductors","Copenhagen plank 2 × 25 s each side"],["Shoulders","Band external rotation and pull-aparts 2 × 15"],["Hips","Hip airplanes, 90/90 switches"]]}},
+  maint:{intent:"minimum dose: short sessions, nothing that leaves you sore",
+    why:"Holds on to strength with the minimum dose: two short sessions plus mobility. Nothing that leaves you sore for the weekend's key sessions.",
+    A:{t:"Strength A: maintenance", min:30, ex:[["Main lift","Squat 2 × 4 at RPE 7"],["Single leg","Single-leg RDL 2 × 6 each leg"],["Pull","Pull-up 2 × 6"],["Trunk","Pallof press 2 × 10 each side"]]},
+    B:{t:"Strength B: maintenance", min:30, ex:[["Main lift","Trap-bar deadlift 2 × 4 at RPE 7"],["Single leg","Step-up 2 × 6 each leg"],["Press","Push-up 2 × 12"],["Plyo","Pogo hops 2 × 20"]]},
+    C:{t:"Mobility and prehab", min:20, ex:[["Lower leg","Calf raises 2 × 15 each way"],["Shoulders","Band external rotation 2 × 15"],["Hips","Hip airplanes, 90/90 switches"],["Upper back","Open books 2 × 8 each side"]]}}
+};
+function lift(key, slot, light){
+  const lib=LIFTLIB[key], L=lib[slot];
+  const steps=L.ex.map(e=>st(e[0], e[1]));
+  if(light) steps.unshift(st("This week","Light: 2 sets of everything at RPE 6. Nothing new, nothing to failure."));
+  return S("lift", L.t + (light ? " (light)" : ""), light ? Math.round(L.min*0.7) : L.min, {purpose:lib.why, steps,
+    notes:["Reserved slot. If you run your own programme, keep it and match the phase intent: " + lib.intent + ".", "Straight after the swim, same trip."]});
+}
+function liftCustom(title, min, text){ return S("lift", title, min, {purpose:"Race week: the slot stays, the load goes.", steps:[st("Session", text)]}); }
+
+/* Easy running */
+function runEasy(min, strides, hills){
+  const steps=[st("Run", min + " min easy", "z2", "Conversational. On hills, slow down so the effort stays the same.")];
+  if(strides) steps.push(st("Strides", strides + " × 20 s quick and relaxed, walk back", "fast", "Tall, light, smooth. Not sprints."));
+  if(hills) steps.push(st("Hill sprints", "6 × 10 s fast uphill, full walk-back recovery", "fast", "Short enough that there's no burn: this is for power and form."));
+  return S("run", hills ? "Easy run with hill sprints" : (strides ? "Easy run with strides" : "Easy run"), min + ((strides||hills)?5:0), {z:"z2", src:["bu"],
+    purpose:"Frequent, genuinely easy running keeps the run engine ticking at low cost. Blummenfelt's weeks are built from lots of short easy runs around a few key sessions.", steps});
+}
+function runOffBike(min, z, detail){
+  return S("run", z==="race" ? "Run off the bike: race pace" : "Run off the bike", min, {z:z||"z2", src:["watson"],
+    purpose:"Straight out of the saddle and running within five minutes. Teaches your legs to run on bike-tired muscles, which is the only kind you'll have in Weymouth.",
+    steps:[st("Run", detail || (min + " min easy, within 5 min of finishing the ride"), z||"z2", "The first few minutes feel awkward. Short, quick steps until the legs come back.")]});
+}
+function bikeEasy(min, extra){
+  return S("bike", "Easy ride", min, {z:"z2", src:["plews"], purpose:"Aerobic volume that costs almost nothing. Keep it genuinely easy so the key sessions stay high quality.",
+    steps:[st("Ride", min + " min endurance", "z2"), ...(extra ? [extra] : [])]});
+}
+function swimEasy(title, min, pull){
+  const m=Math.round(min*35/100)*100;
+  return S("swim", title, min, {m, z:"z2", src:["watson"], purpose:"Easy swim: long strokes, technique focus, no clock-watching.",
+    steps:[st("Warm-up","300 m easy","rec"), st("Drill","6 × 50 m drill of your choice, 15 s rest","drill"),
+      st("Main", pull ? ((m-800) + " m as 200s with pull buoy, 20 s rest") : ((m-800) + " m easy as 200s, 20 s rest"), "z2"),
+      st("Cool-down","200 m easy","rec")]});
+}
+function heatItem(block){
+  return S("heat", block ? "Heat block: sauna or hot bath" : "Heat maintenance", 25, {src:["bu","plews"],
+    purpose: block ? "Blummenfelt starts his season with a heat block and then maintains it with a few heat sessions each week. Heat raises blood plasma volume, which he credits with extra power even in cool races." : "Two short heat sessions a week hold on to the adaptation from the June block.",
+    steps:[st("Heat","20–30 min sauna at 80–90 °C straight after training, or a 40 °C bath for 30–40 min","","Sit up, sip water. Get out if you feel dizzy, sick or headachy.")],
+    notes:["Skip it if you're unwell or have any heart condition, and don't do it alone after a very hard session.","Not counted in your 14 hours."]});
+}
+function addHeat(days, idxs, block){ idxs.forEach(d => days[d].push(heatItem(block))); }
+
+/* Open water */
+const OW = {
+  intro:{t:"Open water: first swim of the year", min:40, steps:[st("Acclimatise","5 min easy breaststroke and floating, face in and out","rec","Cold shock is real at 14–16 °C: breathe out slowly and wait until your breathing settles."), st("Main","20–30 min continuous freestyle, sighting every 6–8 strokes","z2"), st("Exit","Practise standing up, jogging out and unzipping the wetsuit","")]},
+  sighting:{t:"Open water: sighting and straight lines", min:45, steps:[st("Warm-up","10 min easy","z2"), st("Main","4 × 400 m at race effort between two buoys, 1 min floating rest","race","Sight every 6 strokes. Count how often you drift off line and halve it by the last rep."), st("Cool-down","5 min easy","rec")]},
+  starts:{t:"Open water: race starts", min:45, steps:[st("Warm-up","10 min easy","z2"), st("Main","6 × (100 m hard from a wade-in or deep-water start, then 200 m settling into race pace)","race","Weymouth uses a rolling start: practise going from standing to swimming calmly."), st("Cool-down","5 min easy","rec")]},
+  turns:{t:"Open water: buoy turns and race pace", min:45, steps:[st("Warm-up","10 min easy","z2"), st("Main","2 × 15 min at race pace around a buoy loop, 3 min easy between","race","Practise tight turns: a quick roll on to your back at the buoy turns you sharply."), st("Cool-down","5 min easy","rec")]},
+  draft:{t:"Open water: drafting", min:45, need:"Needs a training partner of similar speed.", steps:[st("Warm-up","10 min easy","z2"), st("Main","4 × 5 min swapping the lead with a partner: 1 min on the feet, 1 min on the hip","race","A good draft on race day is worth more than a month of extra swim training."), st("Cool-down","5 min easy","rec")]},
+  sim:{t:"Open water: race-distance rehearsal", min:55, steps:[st("Warm-up","10 min easy","z2"), st("Main","1,900 m (or 40–45 min) at race effort, timed","race","Full race kit: wetsuit, goggles, anti-chafe on the neck."), st("T1 practice","Jog 200 m and get the wetsuit off in under 90 s","")]},
+  kit:{t:"Open water: kit check and race pace", min:45, steps:[st("Warm-up","10 min easy","z2"), st("Main","2 × 20 min at race pace, 3 min easy between","race","Final check of goggles (tinted and clear), wetsuit fit and anti-chafe."), st("Cool-down","5 min easy","rec")]},
+  conf:{t:"Open water: confidence swim", min:35, steps:[st("Main","25 min easy, then 6 × 1 min quicker with 1 min easy","z2","Leave the water wanting more.")]}
+};
+function owSession(key){
+  const o=OW[key];
+  return S("swim", o.t, o.min, {z:"race", src:["watson"], purpose:"Open-water skills are free time on race day: sighting, starts, turns and drafting.", steps:o.steps,
+    notes:["Closest sea-water option from central Bristol: Clevedon Marine Lake. Otherwise a managed lake. Tow float, never alone.","If the water is under 14 °C, keep it to 20 minutes or swim last week's pool session instead.", ...(o.need ? [o.need] : [])]});
+}
+
+/* ---------------- Benchmarks ---------------- */
+function ftpTest(first){
+  return S("bike", first ? "Baseline: FTP test" : "Benchmark: FTP test", 60, {key:true, z:"thr", src:["lorang"],
+    purpose:"Sets every power target in the plan. Same trainer, same time of day and same warm-up every time, so the numbers are comparable.",
+    steps:[st("Warm-up","15 min building, 3 × 1 min at 100 rpm, 5 min easy","z2"),
+      st("Option A","Ramp test in your trainer app: FTP is usually set at about 75% of your best 1-min power","thr"),
+      st("Option B","20 min as hard as you can hold evenly; FTP is 95% of the average power","thr","Start conservatively: the last 5 minutes should be the hardest."),
+      st("Cool-down","10–15 min easy","rec")],
+    notes:["Enter the result on the Your numbers tab and every bike target updates.","No power meter yet: ride the 20 min hard and use the average heart rate of the last 15 min as your threshold heart rate."]});
+}
+function runBenchmark(){
+  return S("run","Benchmark: 8 × 1 km", 55, {key:true, z:"thr", src:["lorang"],
+    purpose:"Lorang prefers repeating a standard training session to stopping training for a test. This is the run version: same route, same rest, then compare pace and heart rate with last time.",
+    steps:[st("Warm-up","15 min easy + 4 strides","z2"), st("Main","8 × 1 km at threshold effort, 60 s standing rest","thr","Record pace and average heart rate for every rep."), st("Cool-down","10 min easy","rec")],
+    notes:["Faster pace at the same heart rate than last time means threshold has moved: update threshold pace by the same amount.","First time (week 9): if you haven't set threshold pace from your half, use the average of reps 3–8."]});
+}
+function cssTest(first){
+  return S("swim", first ? "Baseline: CSS test" : "Benchmark: CSS test", 45, {key:true, m:1700, z:"thr",
+    purpose:"Critical swim speed is your swim threshold. Every swim target in the plan is built from it.",
+    steps:[st("Warm-up","400 m easy + 4 × 50 m build","rec"), st("Test 1", first ? "400 m time trial from a push start (or 200 m if 400 m continuous isn't there yet)" : "400 m time trial from a push start","thr","Evenly paced, as fast as you can hold."),
+      st("Recover","5–10 min easy swimming or rest","rec"), st("Test 2", first ? "200 m time trial (or 100 m if you swam 200 m above)" : "200 m time trial","thr"), st("Cool-down","200–300 m easy","rec")],
+    notes:["CSS per 100 m = (400 m time − 200 m time) ÷ 2. The Your numbers tab does the sum."]});
+}
+function racePowerCheck(){
+  return S("bike","Race-power check", 60, {key:true, z:"race", src:["watson"], purpose:"Too late in the season for an FTP test. Instead, confirm race power: 20 minutes at planned race power while you watch heart rate and feel.",
+    steps:[st("Warm-up","15 min building","z2"), st("Main","20 min at planned race power","race","Should feel like 5/10, with heart rate settling rather than climbing. A climbing heart rate means race power is set too high."), st("Endurance","Remaining time easy","z2")]});
+}
+
+/* ---------------- Phase 1 ---------------- */
+const CUES = [
+  {name:"Body position", drill:"fingertip drag", cue:"look at the floor, press your chest down and let the hips rise"},
+  {name:"Rotation", drill:"6-kick switch", cue:"rotate from the hips to about 40 degrees, head still"},
+  {name:"Catch", drill:"single-arm, other arm in front", cue:"fingertips down early, elbow high, push water back not down"},
+  {name:"Breathing", drill:"catch-up with breathing every 3", cue:"breathe out fully underwater so the breath in is quick and relaxed"},
+  {name:"Kick", drill:"kick on your side with fins", cue:"small, quick kick from the hips with loose ankles"},
+  {name:"Stroke length", drill:"catch-up", cue:"count strokes per length and take one or two fewer without slowing"}
+];
+function swimTechP1(k){
+  const c=CUES[k], n=[4,5,6,6,7,8][k], pull=k>=2, m=300+400+n*100+(pull?200:0)+200;
+  return S("swim", "Technique: " + c.name.toLowerCase(), [45,50,55,55,55,60][k], {m, z:"drill", src:["watson","lorang"],
+    purpose:"Technique is the quickest route to swim speed when you can't yet swim 1.5 km. One focus a week; this week it's " + c.name.toLowerCase() + ".",
+    steps:[st("Warm-up","300 m: 100 free, 100 kick with fins, 100 free","rec"),
+      st("Drill","8 × 50 m: 25 m " + c.drill + ", 25 m swim, 20 s rest","drill","Cue: " + c.cue + "."),
+      st("Main", n + " × 100 m freestyle, 20 s rest","z2","Hold one thought only: " + c.cue + "."),
+      ...(pull ? [st("Pull","4 × 50 m with pull buoy, 15 s rest","z2","Feel the catch without the legs helping.")] : []),
+      st("Cool-down","200 m easy, any stroke","rec")],
+    notes:["Film a few lengths every three or four weeks; a friend with a phone on poolside is enough. A couple of 1:1 lessons or a masters squad during this phase will pay back more than any set."]});
+}
+function swimSpeedP1(k){
+  const fast=[8,8,10,10,12,12][k];
+  const main=[["4 × 150 m",600],["5 × 150 m",750],["4 × 200 m",800],["5 × 200 m",1000],["6 × 200 m",1200],["4 × 250 m",1000]][k];
+  const m=300+200+fast*25+main[1]+200;
+  return S("swim","Aerobic swim with fast 25s", [45,50,50,55,60,60][k], {m, z:"z2", src:["lorang"],
+    purpose:"Short, fast, relaxed 25s for speed and feel, then steady aerobic swimming. Lorang opens every cycle with technique and controlled VO2 work.",
+    steps:[st("Warm-up","300 m easy","rec"), st("Drill","4 × 50 m, drill of the week, 15 s rest","drill"),
+      st("Speed", fast + " × 25 m smooth-fast, 30 s rest","fast","Fast but long and relaxed. If the stroke falls apart, ease off: quality, not thrashing."),
+      st("Main", main[0] + " steady, 25 s rest","z2","Even pace across every rep."), st("Cool-down","200 m easy","rec")]});
+}
+function swimEndP1(k){
+  const main=[["4 × 200 m, 30 s rest",800],["3 × 300 m, 30 s rest",900],["2 × 400 m + 2 × 200 m, 30 s rest",1200],["2 × 500 m, 45 s rest",1000],["600 m + 400 m + 200 m, 30 s rest",1200],["800 m + 400 m, 30 s rest",1200]][k];
+  return S("swim","Endurance builder", [40,45,50,50,55,55][k], {m:300+main[1]+200, z:"z2", key:true, src:["watson"],
+    purpose:"The most important swim of the week right now: extending how far you can swim without stopping.",
+    steps:[st("Warm-up","300 m easy including 4 × 25 m drill","rec"), st("Main", main[0], "z2","Start slower than feels right. Breathe every 2 or every 3 strokes, whichever keeps you calm."), st("Cool-down","200 m easy","rec")],
+    notes:["Milestones: 1,000 m continuous by Christmas, 1,500 m by mid-January, 1,900 m (race distance) by mid-February."]});
+}
+function bikeVO2P1(k){
+  const sets=["5 × 3 min","6 × 3 min","4 × 4 min","5 × 4 min","6 × 4 min","5 × 5 min"][k];
+  const rest=["3 min","3 min","4 min","4 min","4 min","5 min"][k];
+  return S("bike","Controlled VO2max intervals", [60,65,60,70,75,80][k], {key:true, z:"vo2", src:["lorang","plews"],
+    purpose:"Phase 1 in Lorang's model raises aerobic capacity. Small doses of VO2max work lift the ceiling while everything around them stays easy.",
+    steps:[st("Warm-up","15 min building through endurance, then 3 × 1 min at 100+ rpm","z2"),
+      st("Main", sets + " at VO2max, " + rest + " easy spinning between","vo2","Cadence 90–100. The last rep should match the first; if power drops more than 5%, end the set there."),
+      st("Endurance","Remaining time steady","z2"), st("Cool-down","5 min easy","rec")],
+    notes:["Lorang describes VO2max work as a controlled intensity, not sprinting. A trainer makes this far easier to pace.","Readiness rule: if morning HRV is well below normal and you feel flat, ride 60 min easy instead."]});
+}
+function bikeSkillsP1(k){
+  return S("bike","Endurance ride with pedalling drills", [45,50,55,60,60,60][k], {z:"z2", src:["watson"],
+    purpose:"Watson treats early winter as the time to work on skills before training gets serious. Single-leg drills smooth out the dead spots in the pedal stroke that most runners-turned-cyclists have.",
+    steps:[st("Warm-up","10 min easy","rec"),
+      st("Skills","4 × (1 min right leg only, 1 min left leg only, 2 min both) at 70–90 rpm","z2","Unclip one foot and rest it on a chair or the trainer frame. Aim for even pressure all the way round."),
+      st("Endurance","Remaining time steady, cadence 85–95","z2")]});
+}
+function rideLongP1(k){
+  const min=[105,120,135,135,150,165][k];
+  return S("bike","Long ride", min, {key:true, z:"z2", src:["plews","lorang"],
+    purpose:"Building the bike engine from almost nothing. All of it below LT1: the adaptations you want here come from time on the bike, not intensity.",
+    steps:[st("Ride", fmtDur(min) + " continuous endurance, cadence 85–95","z2","On hills, change down early and keep power in zone rather than grinding."),
+      st("Fuelling","From 30 min in: 40–60 g carbohydrate and about 500 ml fluid per hour","","Start now. The gut needs months, not weeks, to cope with race fuelling.")],
+    notes:["Indoors is fine (Plews does the bulk of his own training indoors), but keep indoor rides to 2 hours and get outside at least every other week for handling skills."]});
+}
+function runHillsP1(k){
+  const reps=["8 × 60 s","10 × 60 s","8 × 90 s","10 × 90 s","6 × 2 min","8 × 2 min"][k];
+  return S("run","Hill reps", [50,55,55,60,60,65][k], {key:true, z:"hill", src:["lorang"],
+    purpose:"Lorang uses hill reps to raise VO2max in the first phase of the run: high aerobic stress with less pounding than flat speedwork.",
+    steps:[st("Warm-up","15 min easy, then drills: A-skips, high knees, heel flicks, 2 × 20 m each","z2"),
+      st("Main", reps + " uphill at hard but controlled effort, jog back down as recovery","hill","Gradient 4–7%. Drive the arms, stay tall. Same speed on the last rep as the first."),
+      st("Cool-down","10 min easy","rec")],
+    notes:["Bristol has no shortage of hills; a treadmill at 5–6% works too."]});
+}
+function runLongP1(k){
+  const min=[70,75,80,85,90,95][k];
+  return S("run","Long run", min, {key:true, z:"z2", src:["lorang","plews"],
+    purpose:"Aerobic durability for the run. Fresh off a half-marathon block, this pace will feel too slow. It's meant to.",
+    steps:[st("Run", fmtDur(min) + " easy, below LT1 the whole way","z2","If heart rate creeps up in the last 20 min, slow down rather than push on."), st("Fuelling","A gel or about 30 g carbohydrate after 60 min","","Gut practice for race day.")],
+    notes:["Frodeno credits Lorang's biggest contribution as holding him back, and the consistency that followed."]});
+}
+function wkLoadP1(k){
+  const L=s=>lift("found", s, false);
+  return [
+    [swimTechP1(k), L("A")],
+    [bikeVO2P1(k), ...(k>=1 ? [runEasy(30)] : [])],
+    [swimSpeedP1(k), L("B"), runEasy([40,40,45,45,45,50][k], 6)],
+    [runHillsP1(k), bikeSkillsP1(k)],
+    [swimEndP1(k), L("C")],
+    [rideLongP1(k)],
+    [runLongP1(k)]
+  ];
+}
+
+/* ---------------- Phase 2 ---------------- */
+function swimStrengthP2(k){
+  const main=[["6 × 100 m",600],["4 × 200 m",800],["5 × 200 m",1000],["6 × 200 m",1200],["4 × 300 m",1200],["5 × 300 m",1500],["3 × 400 m",1200]][k];
+  return S("swim","Strength swim: paddles and pull", [55,55,60,60,65,65,65][k], {m:400+300+main[1]+200+200, z:"z2", src:["lorang"],
+    purpose:"The swim side of the strength-endurance phase. Paddles load the catch; the pull buoy lets you concentrate on it.",
+    steps:[st("Warm-up","400 m: 200 free, 100 kick, 100 pull","rec"), st("Drill","6 × 50 m single-arm or catch-up, 15 s rest","drill"),
+      st("Main", main[0] + " pull with paddles and buoy, 20 s rest","z2","Long, strong strokes. Count strokes per length and keep the count steady."),
+      st("Kick","8 × 25 m kick with fins, fast, 15 s rest","fast"), st("Cool-down","200 m easy","rec")],
+    notes:["Start with small paddles. Any pain at the front of the shoulder: paddles off for the rest of the week."]});
+}
+function swimCSSIntroP2(k){
+  const c=[["8 × 100 m, 15 s rest",800,"race"],["10 × 100 m, 15 s rest",1000,"race"],["8 × 100 m, 15 s rest",800,"thr"],["10 × 100 m, 15 s rest",1000,"thr"],["12 × 100 m, 15 s rest",1200,"thr"],["4 × 300 m, 30 s rest",1200,"race"],["3 × 400 m, 30 s rest",1200,"race"]][k];
+  return S("swim", c[2]==="thr" ? "CSS intervals" : "Race-pace intervals", [50,55,55,55,60,60,60][k], {m:400+300+c[1]+200, z:c[2], src:["bu","plews"],
+    purpose:"Your first regular threshold-paced swimming. CSS is the pool version of LT2.",
+    steps:[st("Warm-up","400 m easy","rec"), st("Build","6 × 50 m, each one a little quicker, 15 s rest","z2"),
+      st("Main", c[0], c[2], "Even splits. Miss the target by more than 3 s on two reps in a row: add 10 s rest."), st("Cool-down","200 m easy","rec")]});
+}
+function swimContP2(k){
+  const d=[1000,1200,1300,1500,1500,1700,1900][k];
+  return S("swim", d===1900 ? "Race distance, continuous" : "Continuous swim", [45,50,50,55,55,60,65][k], {m:300+d+200, z:"z2", key:true, src:["watson"],
+    purpose: d===1900 ? "Milestone: the full race distance without stopping." : "Pushing continuous distance towards 1,900 m.",
+    steps:[st("Warm-up","300 m easy with 4 × 25 m drill","rec"), st("Main", d.toLocaleString("en-GB") + " m continuous" + (k===4 ? ", second half faster than the first" : ""), "z2", "Note the time: it's your first real guide to race-day swim pace."), st("Cool-down","200 m easy","rec")]});
+}
+function bikeLowCadP2(k){
+  const sets=["4 × 8 min","5 × 8 min","6 × 8 min","4 × 10 min","4 × 12 min","5 × 12 min","4 × 15 min"][k];
+  return S("bike","Low-cadence strength intervals", [75,80,85,80,90,95,100][k], {key:true, z:"lc", src:["plews","lorang"],
+    purpose:"Lorang's second phase is strength-endurance. On the bike, Plews uses low-cadence work at moderate intensity because lower-cadence training has been linked with bigger gains in threshold power.",
+    steps:[st("Warm-up","15 min building, then 2 × 1 min at 100+ rpm","z2"),
+      st("Main", sets + " at 60–70 rpm, 4 min easy spinning between","lc","Seated, quiet upper body, push through the whole stroke. Knees complaining means cadence is too low: go to 70–75."),
+      st("Endurance","Remaining time steady at normal cadence","z2"), st("Cool-down","5 min easy","rec")],
+    notes:["Big gear, low cadence, moderate power. This is strength work, so power stays well under threshold."]});
+}
+function runUphillP2(k){
+  const reps=["3 × 1.5 km","3 × 2 km","4 × 2 km","4 × 2 km","5 × 2 km","5 × 2 km","5 × 2 km"][k];
+  return S("run","Long uphill reps (strength)", [60,65,70,70,80,80,80][k], {key:true, z:"lt1", src:["lorang"],
+    purpose:"Straight from Lorang's playbook: long uphill runs at low intensity (he uses 4–5 × 2 km) build running strength without the impact of speedwork. Haug's view is that long-course running rewards strength and endurance more than raw speed.",
+    steps:[st("Warm-up","15 min easy","z2"), st("Main", reps + " uphill at easy-to-steady effort, jog or walk back down","lt1","Effort stays at or just under LT1 even though you're climbing, so pace will be slow. Gradient 3–6%."), st("Cool-down","10 min easy","rec")],
+    notes:["No 2 km hill nearby: treadmill at 5–6% incline, or repeat a long gradual drag."]});
+}
+function rideLongP2(k){
+  const min=[150,165,180,180,195,195,210][k];
+  return S("bike","Long ride", min, {key:true, z:"z2", src:["lorang","plews"],
+    purpose:"The weekly backbone of the bike build.",
+    steps:[st("Ride", fmtDur(min) + " endurance","z2"),
+      ...(k>=3 ? [st("Climbs","3 × 10 min seated climbing at 65–75 rpm in the second half","lt1","Real hills outside; higher resistance on the trainer.")] : []),
+      st("Fuelling","50–70 g carbohydrate and 500–750 ml fluid per hour","","Keep nudging the carbohydrate up through the winter.")],
+    notes:["Ice, dark or storms: ride 2:00–2:15 indoors instead, as 2 × 30 min steady (around LT1) inside an endurance ride. Indoor time is denser, so it's a fair swap."]});
+}
+function runLongP2(k){
+  const min=[95,95,100,100,105,105,110][k];
+  return S("run","Long run", min, {key:true, z:"z2", src:["lorang"], purpose:"Aerobic durability. Still easy: the strength work happens on Thursday.",
+    steps:[st("Run", fmtDur(min) + " easy","z2"), ...(k>=3 ? [st("Finish","Last 15 min steady","lt1","Smooth, not a race.")] : []), st("Fuelling","About 30 g carbohydrate every 40 min after the first hour","")]});
+}
+function wkLoadP2(k){
+  const L=s=>lift("max", s, false);
+  const tueRun=[0,0,15,15,20,20,20][k];
+  return [
+    [swimStrengthP2(k), L("A")],
+    [bikeLowCadP2(k), tueRun ? runOffBike(tueRun) : runEasy(30)],
+    [swimCSSIntroP2(k), L("B"), runEasy(45, 6)],
+    [runUphillP2(k), bikeEasy(60, st("Spin-ups","6 × 30 s at 110+ rpm, smooth","z2"))],
+    [swimContP2(k), L("C")],
+    [rideLongP2(k)],
+    [runLongP2(k)]
+  ];
+}
+
+/* ---------------- Phase 3 ---------------- */
+function bikeThrP3(k){
+  const c=[["5 × 8 min","nt1","2 min"],["4 × 10 min","nt1","2 min"],["3 × 12 min","nt2","3 min"],["5 × 10 min","nt1","2 min"],["4 × 12 min","nt2","2 min"],["3 × 20 min","nt1","3 min"]][k];
+  return S("bike","Sub-threshold intervals", [75,75,75,90,90,95][k], {key:true, z:c[1], src:["bu"],
+    purpose:"The Norwegian method without the finger-pricking: lots of time between LT1 and LT2, short recoveries, and a strict ceiling so you can back it up two days later.",
+    steps:[st("Warm-up","15 min building, 3 × 1 min at 100 rpm","z2"),
+      st("Main", c[0] + ", " + c[2] + " easy between", c[1], "A ceiling, not a target to beat: if heart rate drifts above the zone, take 5–10 W off. Finishing as if you could do one more rep is the goal."),
+      st("Endurance","Remaining time steady","z2"), st("Cool-down","5 min easy","rec")],
+    notes:["Bu's athletes do much of this indoors for control. Without a lactate meter, power plus a heart-rate ceiling is the practical stand-in."]});
+}
+function runThrP3(k){
+  const c=[["6 × 5 min","nt1","60 s"],["5 × 6 min","nt1","60 s"],["8 × 1 km","nt2","60 s"],["10 × 1 km","nt2","60 s"],["4 × 10 min","nt1","90 s"],["3 × 12 min","nt2","2 min"]][k];
+  return S("run","Sub-threshold run intervals", [60,60,65,70,75,75][k], {key:true, z:c[1], src:["bu"],
+    purpose:"Norwegian-style threshold running: controlled, repeatable, short rests. Builds time just under LT2 without the recovery bill of an all-out session.",
+    steps:[st("Warm-up","15 min easy + 4 strides","z2"), st("Main", c[0] + ", " + c[2] + " standing or walking rest", c[1], "Flat route or track. Same pace every rep; the last should feel like the first."), st("Cool-down","10 min easy","rec")]});
+}
+function rideLongP3(k){
+  const min=[180,195,210,210,225,225][k];
+  return S("bike","Long ride", min, {key:true, z:"z2", src:["plews"],
+    purpose: k>=2 ? "Plews' shift from polarised towards pyramidal starts here: some race-intensity work inside the long ride." : "Endurance volume, now 3 hours and up.",
+    steps:[st("Ride", fmtDur(min) + " endurance","z2"),
+      ...(k>=2 ? [st("Race blocks","3 × 15 min at 70.3 race intensity in the second half, 10 min easy between","race","On the aero bars if they're fitted.")] : []),
+      st("Fuelling","60–80 g carbohydrate per hour","")],
+    notes:["Ride outdoors whenever the weather allows from here. Handling, descending and the aero position need real roads."]});
+}
+function runLongP3(k){
+  const min=[90,95,100,90,100,90][k];
+  if(k===3 || k===5){
+    const a=k===3 ? 15 : 20;
+    return S("run","Long run with tempo-to-threshold block", min, {key:true, z:"nt1", src:["bu"],
+      purpose:"Modelled on Alan Couzens' analysis of Blummenfelt's running: a tempo block rolling straight into threshold work inside a long run, scaled down. Keep Saturday's ride easy this weekend.",
+      steps:[st("Run","30 min easy","z2"), st("Tempo", a + " min sub-threshold (medium)","nt1"), st("Threshold","10 min sub-threshold (hard), no break","nt2","Rolls straight on from the tempo."), st("Run", (min-30-a-10) + " min easy to finish","z2"), st("Fuelling","Gel before the tempo block","")]});
+  }
+  return S("run","Long run", min, {key:true, z:"z2", src:["lorang"], purpose:"Aerobic durability.",
+    steps:[st("Run", fmtDur(min) + " easy","z2"), ...(k===1 ? [st("Finish","Last 20 min steady","lt1")] : []), st("Fuelling","About 30 g carbohydrate every 40 min after the first hour","")]});
+}
+function swimCSSP3(k){
+  const c=[["10 × 100 m, 15 s rest",1000],["12 × 100 m, 15 s rest",1200],["5 × 200 m, 20 s rest",1000],["4 × 300 m, 20 s rest",1200],["15 × 100 m, 15 s rest",1500],["3 × 500 m, 30 s rest",1500]][k];
+  return S("swim","CSS threshold set", [55,55,55,60,65,65][k], {m:400+200+c[1]+200, z:"thr", key:true, src:["bu","plews"],
+    purpose:"The swim threshold session: the biggest single lever on your 1.9 km time.",
+    steps:[st("Warm-up","400 m easy","rec"), st("Drill","4 × 50 m drill, 15 s rest","drill"), st("Main", c[0], "thr", "Hold CSS. Reps of 200 m and longer can be 1–2 s per 100 m slower."), st("Cool-down","200 m easy","rec")]});
+}
+function swimSpeedPull(k){
+  const pull=[["4 × 300 m",1200],["3 × 400 m",1200],["4 × 300 m",1200],["3 × 400 m",1200],["2 × 600 m",1200],["4 × 400 m",1600]][k];
+  return S("swim","Speed and aerobic pull", [55,55,55,55,55,65][k], {m:400+300+pull[1]+200, z:"z2", src:["lorang"],
+    purpose:"A small dose of speed to keep the top end alive, then aerobic pull for strength.",
+    steps:[st("Warm-up","400 m easy","rec"), st("Speed","12 × 25 m fast, 20 s rest","fast"), st("Main", pull[0] + " pull with paddles, 20 s rest","z2"), st("Cool-down","200 m easy","rec")]});
+}
+function swimRaceP3(k){
+  const c=[["2 × 800 m, 45 s rest",1600],["1,900 m continuous, timed",1900],["3 × 600 m, 30 s rest",1800],["2 × 1,000 m, 45 s rest",2000],["1,900 m continuous, sighting every 6th stroke",1900],["4 × 500 m, 30 s rest",2000]][k];
+  return S("swim","Race-pace endurance", [50,55,60,60,60,65][k], {m:300+c[1]+200, z:"race", src:["watson"],
+    purpose:"Longer swimming at the pace you'll hold in Weymouth Bay.",
+    steps:[st("Warm-up","300 m easy","rec"), st("Main", c[0], "race", "Practise sighting: lift the eyes, not the whole head, then turn to breathe."), st("Cool-down","200 m easy","rec")]});
+}
+function wkLoadP3(k){
+  const L=s=>lift("power", s, false);
+  return [
+    [swimCSSP3(k), L("A")],
+    [bikeThrP3(k), runOffBike(20, "z2", "20 min easy off the bike, last 5 min at race feel")],
+    [swimSpeedPull(k), L("B"), runEasy(40, 0, true)],
+    [runThrP3(k), bikeEasy(60)],
+    [swimRaceP3(k), L("C")],
+    [rideLongP3(k)],
+    [runLongP3(k)]
+  ];
+}
+
+/* ---------------- Phase 4 ---------------- */
+function bikeClimbP4(k){
+  const sets=["5 × 8 min","4 × 12 min","3 × 15 min","5 × 10 min","4 × 15 min","3 × 20 min"][k];
+  return S("bike","Climbing strength at race power", [80,85,85,90,95,95][k], {key:true, z:"race", src:["lorang","plews"],
+    purpose:"Strength-endurance again, now at race intensity and outdoors where you can. Weymouth rolls: this is how you get strong on drags without blowing up.",
+    steps:[st("Warm-up","15 min building","z2"),
+      st("Main", sets + " at race power, 60–70 rpm, 4–5 min easy between","race","A long, steady climb is ideal: Burrington Combe or another Mendip climb. Indoors: high resistance, same power."),
+      st("Endurance","Remaining time steady","z2"), st("Cool-down","5 min easy","rec")]});
+}
+function runUphillRaceP4(k){
+  const c=[["4 × 2 km uphill",""],["5 × 2 km uphill",""],["5 × 2 km uphill","2 km"],["4 × 2 km uphill","3 km"],["5 × 2 km uphill","3 km"],["4 × 2 km uphill","4 km"]][k];
+  const steps=[st("Warm-up","15 min easy","z2"), st("Main", c[0] + " at easy-to-steady effort, jog down","lt1","Strength, not speed: effort stays near LT1.")];
+  if(c[1]) steps.push(st("Race pace", c[1] + " on the flat at 70.3 race pace, straight after the last rep","race","Tired legs, controlled pace: the feeling of the second half of the run."));
+  steps.push(st("Cool-down","10 min easy","rec"));
+  return S("run", c[1] ? "Uphill reps with a race-pace finish" : "Long uphill reps", [70,80,85,80,90,90][k], {key:true, z:"lt1", src:["lorang"],
+    purpose:"Lorang's run strength phase, second time round, now finishing with race pace on tired legs.", steps});
+}
+function rideLongP4(k){
+  const min=[195,210,225,210,225,240][k];
+  return S("bike","Long hilly ride", min, {key:true, z:"z2", src:["lorang","watson"],
+    purpose:"Outdoors, hilly and closer to race demands. Climbs at race intensity, never above.",
+    steps:[st("Ride", fmtDur(min) + " endurance on a hilly route (Mendips or Cotswolds)","z2"),
+      st("Climbs","Every climb longer than 3 min at race intensity, not above","race","Watson's warning: racing harder than you've trained is the classic 70.3 mistake. Learn your ceiling now."),
+      ...(k>=3 ? [st("Finish","Final 30 min at race intensity on rolling roads, in the aero position","race")] : []),
+      st("Fuelling","70–90 g carbohydrate per hour, using the products you'll race with","")]});
+}
+function runLongP4(k){
+  const min=[90,95,100,95,100,95][k];
+  return S("run","Long run", min, {key:true, z:"z2", src:["lorang"],
+    purpose: k>=3 ? "A first taste of economisation: race pace dropped into an easy long run." : "Aerobic durability.",
+    steps:[st("Run", fmtDur(min) + " easy","z2"), ...(k>=3 ? [st("Race pace","4 × 5 min at 70.3 race pace in the second hour, 3 min easy between","race")] : []), st("Fuelling","About 30 g carbohydrate every 40 min after the first hour","")]});
+}
+function swimP4Mon(k){
+  const c=[["4 × 400 m at CSS +2 s, 30 s rest",1600,"thr"],["16 × 100 m at CSS, 15 s rest",1600,"thr"],["3 × 600 m, 30 s rest",1800,"race"],["5 × 300 m at CSS +1 s, 20 s rest",1500,"thr"],["2 × 1,000 m, 45 s rest",2000,"race"],["20 × 100 m at CSS +1 s, 10 s rest",2000,"thr"]][k];
+  return S("swim", c[2]==="thr" ? "CSS threshold set" : "Race-pace set", [60,60,65,60,70,70][k], {m:400+200+c[1]+200, z:c[2], key:true, src:["bu","plews"],
+    purpose:"Threshold and race-pace swimming: the backbone of the swim build.",
+    steps:[st("Warm-up","400 m easy","rec"), st("Drill","4 × 50 m drill","drill"), st("Main", c[0], c[2]), st("Cool-down","200 m easy","rec")]});
+}
+function swimP4Fri(k){
+  if(k<=3){
+    const c=[["3 × 600 m with head-up sighting every 6th stroke, 30 s rest",1800],["1,900 m continuous, sighting every 6th stroke",1900],["4 × 500 m, alternating 100 m race pace and 100 m steady",2000],["2 × 1,000 m with sighting, 45 s rest",2000]][k];
+    return S("swim","Race-pace endurance (pool)", [55,55,60,60][k], {m:300+c[1]+200, z:"race", src:["watson"], purpose:"Pool race preparation until the lakes warm up.",
+      steps:[st("Warm-up","300 m easy","rec"), st("Main", c[0], "race"), st("Cool-down","200 m easy","rec")]});
+  }
+  return owSession(k===4 ? "intro" : "sighting");
+}
+function wkLoadP4(k){
+  const L=s=>lift("power", s, false);
+  const satRun=[15,20,20,25,25,30][k];
+  return [
+    [swimP4Mon(k), L("A")],
+    [bikeClimbP4(k), runOffBike(20, "race", "20 min off the bike: 10 min easy, then 10 min at 70.3 race pace")],
+    [swimSpeedPull(k), L("B"), runEasy(40, 6)],
+    [runUphillRaceP4(k), bikeEasy(45)],
+    [swimP4Fri(k), L("C")],
+    [rideLongP4(k), runOffBike(satRun, "z2", satRun + " min easy off the bike, last 5 min at race pace")],
+    [runLongP4(k)]
+  ];
+}
+
+/* ---------------- Phase 5 ---------------- */
+function bikeRaceP5(k){
+  const c=[["3 × 15 min",80,20,10],["3 × 20 min",85,25,15],["2 × 30 min",90,30,20],["3 × 20 min",90,30,20],["2 × 35 min",95,30,20],["3 × 20 min",90,45,30],["2 × 30 min",90,45,30],["3 × 15 min",75,20,10]][k];
+  return [
+    S("bike","Race-intensity intervals", c[1], {key:true, z:"race", src:["lorang","plews"],
+      purpose:"Lorang's economisation phase: race-pace intervals close to competition. Locks in the exact power you'll hold at Weymouth.",
+      steps:[st("Warm-up","15 min building","z2"), st("Main", c[0] + " at 70.3 race power, 5 min easy between","race","Aero position for every interval, cadence 85–90. Drink and eat during the efforts, as on race day."), st("Cool-down","Remaining time easy","rec")]}),
+    runOffBike(c[2], "race", c[2] + " min off the bike: " + c[3] + " min at 70.3 race pace, then " + (c[2]-c[3]) + " min easy")
+  ];
+}
+function runP5(k){
+  const c=[
+    ["5 × 6 min at race pace, 1 min easy jog","race",55,"Economy at race pace: relaxed, efficient, repeatable.","lorang"],
+    ["4 × 1 mile (1.6 km) 10–15 s per mile quicker than race pace, 2 min easy jog","rfast",55,"Watson's session for the final weeks before a 70.3: a little quicker than race pace so race pace feels manageable.","watson"],
+    ["3 × 10 min at race pace, 2 min easy jog","race",60,"Longer race-pace blocks.","lorang"],
+    ["6 × 1 km sub-threshold (hard), 1 min rest","nt2",55,"Norwegian-style top-up of the spring threshold work.","bu"],
+    ["5 × 1 mile 10–15 s per mile quicker than race pace, 2 min easy jog","rfast",60,"Watson's session, one rep longer.","watson"],
+    ["2 × 15 min at race pace, 3 min easy jog","race",60,"Race pace for longer than feels comfortable on a weekday.","lorang"],
+    ["4 × 1 mile 10–15 s per mile quicker than race pace, 2 min easy jog","rfast",55,"Watson's session again: compare splits with week 37.","watson"],
+    ["3 × 8 min at race pace, 2 min easy jog","race",50,"Sharp, not tiring: Saturday is the dress rehearsal.","lorang"]
+  ][k];
+  return S("run","Race-pace run", c[2], {key:true, z:c[1], src:[c[4]], purpose:c[3],
+    steps:[st("Warm-up","15 min easy + 4 strides","z2"), st("Main", c[0], c[1]), st("Cool-down","10 min easy","rec")]});
+}
+function watsonBrick(v){
+  const n=v==="A" ? 2 : 3, ride=60 + n*20 + (n-1)*30 + 42 + 8, run=v==="A" ? 40 : 45;
+  return [
+    S("bike","70.3 brick " + v + ": ride", ride, {key:true, z:"race", src:["watson"],
+      purpose:"Lance Watson's half-ironman brick: race-intensity blocks, low-cadence race-power work late in the ride, then a race-pace run.",
+      steps:[st("Warm-up","60 min endurance","z2"), st("Race blocks", n + " × 20 min at race intensity, 30 min endurance between","race"),
+        st("Low cadence","6 × 3 min at race intensity, 60–70 rpm, 4 min endurance between","race","Late in the ride on tired legs: exactly when the Weymouth climbs bite."),
+        st("Fuelling","Race fuelling throughout","")]}),
+    S("run","70.3 brick " + v + ": run", run, {key:true, z:"race", src:["watson"],
+      purpose:"Straight off the bike at race pace, on race-like terrain if you can.",
+      steps:[st("Run", run + " min between steady and race pace","race","Watson built this to fix the most common 70.3 mistake: racing harder than you trained.")]})
+  ];
+}
+function satP5(k){
+  if(k===0) return [S("bike","Bike-emphasis brick: long ride", 195, {key:true, z:"race", src:["watson"],
+      purpose:"The first of Watson's three 70.3 brick types: a long ride with race-intensity blocks and a short run.",
+      steps:[st("Ride","3:15 on a rolling route","z2"), st("Race blocks","3 × 20 min at race power, 10 min easy between","race"), st("Fuelling","Full race fuelling: 70–90 g carbohydrate per hour","")]}), runOffBike(20)];
+  if(k===1 || k===5) return watsonBrick("A");
+  if(k===3) return watsonBrick("B");
+  if(k===2) return [
+    S("bike","Run-emphasis brick: ride", 150, {key:true, z:"z2", src:["watson"], purpose:"Watson's run-emphasis brick: a moderate ride so the run can carry the quality.",
+      steps:[st("Ride","2:00 endurance","z2"), st("Race block","Final 30 min at race power","race"), st("Fuelling","Race fuelling","")]}),
+    S("run","Run-emphasis brick: run", 50, {key:true, z:"race", src:["watson"], purpose:"The quality half of the brick.",
+      steps:[st("Run","10 min easy off the bike","z2"), st("Main","3 × 10 min at race pace, 3 min easy between","race"), st("Finish","Easy to 50 min","z2")]})];
+  if(k===4) return [
+    S("bike","Weymouth course recce ride", 180, {key:true, z:"race", src:["watson","lorang"],
+      purpose:"Ride the actual course. Learn where the climbs are, where to eat and where the surface is rough.",
+      steps:[st("Ride","The 70.3 bike course, or as much as you can: race power on climbs, about 5% under on the flat","race","Note where the long drags are and how long they take. That becomes your race-day pacing map."), st("Fuelling","Exactly your race plan","")],
+      notes:["Can't make the trip: 3:00 on your hilliest local route with the same structure."]}),
+    runOffBike(20, "race", "20 min at race pace on the seafront if you're in Weymouth; otherwise any flat route")];
+  if(k===6) return [
+    owSession("sim"),
+    S("bike","Race simulation: bike", 150, {key:true, z:"race", src:["watson","plews"], purpose:"Swim, ride and run back to back at race intensity, in race kit, with race fuelling.",
+      steps:[st("Ride","2:30 at race power, on the aero bars wherever it's safe","race"), st("Fuelling","Race plan exactly","")]}),
+    S("run","Race simulation: run", 45, {key:true, z:"race", src:["watson"], purpose:"Race-pace running on genuinely tired legs.",
+      steps:[st("Run","45 min at race pace","race","If pace falls more than 10 s per km in the last 15 min, bike power or fuelling is too ambitious. Change the race plan, not your pride.")]})];
+  return [
+    S("bike","Dress rehearsal: bike", 165, {key:true, z:"race", src:["watson","lorang"], purpose:"Last big session: race-day timings, breakfast, kit and fuelling, start to finish.",
+      steps:[st("Ride","2:45 at planned race power on a rolling route","race"), st("Fuelling","Race plan exactly: same products, same timings","")]}),
+    S("run","Dress rehearsal: run", 60, {key:true, z:"race", src:["watson"], purpose:"Race pace for most of an hour off a race-length ride.",
+      steps:[st("Run","40 min at race pace, then 20 min steady","race")]})];
+}
+function runLongP5(k){
+  const c=[[95,0],[90,4],[80,0],[75,0],[100,6],[90,5],[70,0],[60,0]][k];
+  if(c[1]) return S("run","Long run with race-pace kilometres", c[0], {key:true, z:"race", src:["lorang"],
+    purpose:"Lorang's economisation long run, scaled from his Ironman version (1 km at race pace, 1 km easy) to 70.3.",
+    steps:[st("Run","20 min easy","z2"), st("Alternating km", c[1] + " × (1 km at 70.3 race pace + 1 km easy)","race"), st("Run","Easy to finish","z2"), st("Fuelling","Race gels at race timings","")]});
+  return S("run","Long run", c[0], {z:"z2", key:k<2, src:["lorang"], purpose: k>=2 ? "Shorter and easy after a big Saturday." : "Aerobic durability.",
+    steps:[st("Run", fmtDur(c[0]) + " easy","z2")]});
+}
+function swimP5Mon(k){
+  const c=[["10 × 200 m, 20 s rest",2000,"race"],["3 × 800 m, 30 s rest",2400,"race"],["20 × 100 m at CSS, 15 s rest",2000,"thr"],["2 × 1,200 m, 45 s rest",2400,"race"],["5 × 400 m at CSS +2 s, 20 s rest",2000,"thr"],["1,900 m time trial",1900,"race"],["10 × 150 m at CSS, 15 s rest",1500,"thr"],["8 × 200 m, 20 s rest",1600,"race"]][k];
+  const tt=k===5;
+  return S("swim", tt ? "Swim time trial" : (c[2]==="thr" ? "CSS threshold set" : "Race-pace set"), [65,70,65,70,65,60,55,55][k], {m:400+200+c[1]+200, z:c[2], key:true, src:["bu","watson"],
+    purpose: tt ? "Race distance, flat out but even. Compare with your February continuous swim." : "Race-pace and threshold swimming to hold the gains.",
+    steps:[st("Warm-up","400 m easy","rec"), st("Drill","4 × 50 m drill","drill"), st("Main", c[0], c[2]), st("Cool-down","200 m easy","rec")]});
+}
+function swimP5Wed(k){
+  const p=[["2 × 1,000 m",2000],["3 × 600 m",1800],["2 × 1,000 m",2000],["4 × 500 m",2000],["2 × 1,000 m",2000],["3 × 600 m",1800],["2 × 800 m",1600],["3 × 500 m",1500]][k];
+  return S("swim","Endurance pull with speed", [65,60,65,65,65,60,55,55][k], {m:400+300+p[1]+200, z:"z2", src:["lorang"],
+    purpose:"Aerobic strength in the water with a touch of speed.",
+    steps:[st("Warm-up","400 m easy","rec"), st("Speed","12 × 25 m fast, 20 s rest","fast"), st("Main", p[0] + " pull with paddles, 30 s rest","z2"), st("Cool-down","200 m easy","rec")]});
+}
+function wkLoadP5(k){
+  const L=s=>lift("maint", s, false);
+  const fri = k===6 ? owSession("conf") : owSession(["sighting","starts","turns","draft","sim","starts","conf","kit"][k]);
+  const days=[
+    [swimP5Mon(k), L("A")],
+    bikeRaceP5(k),
+    [swimP5Wed(k), L("B"), runEasy(40, 6)],
+    [runP5(k), bikeEasy(45)],
+    [fri, L("C")],
+    satP5(k),
+    [runLongP5(k)]
+  ];
+  if(k===1 || k===2) addHeat(days, [0,1,2,3,5], true); else addHeat(days, [1,5], false);
+  return days;
+}
+
+/* ---------------- Recovery, test, transition, taper, race ---------------- */
+const LIFTKEY=["found","found","max","power","power","maint","maint"];
+function wkRecovery(w){
+  const p=phaseOf(w).id, L=s=>lift(LIFTKEY[p], s, true);
+  const touch={1:["4 × 1 min at VO2max, 3 min easy","vo2"],2:["3 × 5 min at 60–70 rpm, 3 min easy","lc"],3:["3 × 6 min sub-threshold (medium), 2 min easy","nt1"],4:["3 × 8 min at race power, 4 min easy","race"],5:["2 × 10 min at race power, 5 min easy","race"]}[p];
+  const sat=[0,90,105,120,135,135][p], sun=[0,60,65,70,70,70][p];
+  const days=[
+    [swimEasy("Easy technique swim", 45), L("A")],
+    [S("bike","Endurance ride with a short touch of intensity", 60, {z:"z2", src:["plews"], purpose:"Recovery week: keep the phase's intensity alive with a small dose, nothing more.",
+      steps:[st("Warm-up","15 min easy","z2"), st("Touch", touch[0], touch[1]), st("Endurance","Remaining time easy","z2")]})],
+    [swimEasy("Easy aerobic swim", 45, true), L("B"), runEasy(30)],
+    [runEasy(40, 6)],
+    [p>=5 ? owSession("conf") : swimEasy("Easy swim with drills", 40), L("C")],
+    [S("bike","Easy long ride", sat, {z:"z2", src:["plews"], purpose:"Shorter and easy.", steps:[st("Ride", fmtDur(sat) + " endurance","z2")]}), ...(p>=4 ? [runOffBike(10)] : [])],
+    [S("run","Easy long run", sun, {z:"z2", src:["plews"], purpose:"Easy and a little shorter.", steps:[st("Run", fmtDur(sun) + " easy","z2")]})]
+  ];
+  if(w===11){
+    // Christmas: Thu 24 Dec gets Friday's swim and lift; Fri 25 off; Sat 26 Boxing Day
+    days[3] = [runEasy(40, 6), swimEasy("Christmas Eve swim", 40), L("C")];
+    days[4] = [S("rest","Christmas Day", 0, {purpose:"Day off.", steps:[st("Optional","A walk, if you fancy one","")]})];
+    days[5] = [S("bike","Boxing Day ride (or run)", 90, {z:"z2", src:["plews"], purpose:"Ride or run, whichever appeals. Easy, social, outside if possible.", steps:[st("Session","90 min easy ride, or 60 min easy run if the bike doesn't appeal","z2")]})];
+  }
+  if(p===5) addHeat(days, [1,5], false);
+  return days;
+}
+function wkTest(w){
+  const p=phaseOf(w).id, L=s=>lift(LIFTKEY[p], s, true);
+  const sat=[0,105,120,120,135,135][p], sun=[0,70,70,75,75,75][p];
+  const days=[
+    [swimEasy("Easy technique swim", 45), L("A")],
+    [w===43 ? racePowerCheck() : ftpTest(false)],
+    [swimEasy("Easy aerobic swim", 45, true), L("B"), runEasy(30)],
+    [runBenchmark()],
+    [w===43 ? owSession("conf") : cssTest(false), L("C")],
+    [S("bike","Easy long ride", sat, {z:"z2", src:["plews"], purpose:"Easy after a week of tests.", steps:[st("Ride", fmtDur(sat) + " endurance","z2")]}), ...(p>=4 ? [runOffBike(10)] : [])],
+    [S("run","Easy long run", sun, {z:"z2", src:["plews"], purpose:"Easy.", steps:[st("Run", fmtDur(sun) + " easy","z2")]})]
+  ];
+  if(w===43){ days[4][0].notes = days[4][0].notes.concat(["No CSS test this late; your Monday time trials in weeks 41 and 45 do that job."]); addHeat(days, [1,5], false); }
+  return days;
+}
+function wkTransition(){
+  const L=s=>lift("found", s, true);
+  return [
+    [S("swim","Swim assessment and technique", 40, {m:1100, z:"drill", src:["watson"], purpose:"Day one. Find out where your stroke is, without trying to swim far.",
+      steps:[st("Warm-up","200 m easy, any stroke, rest whenever you need","rec"), st("Drill","6 × 50 m: 25 m catch-up, 25 m swim, 20 s rest","drill"),
+        st("Breathing","8 × 25 m freestyle, breathing every 3 strokes, 20 s rest","z2","Notice which side feels unnatural; that's your homework."),
+        st("Main","4 × 100 m easy freestyle, 30 s rest","z2","What gives out first at the end of each 100: breathing, arms or legs?"), st("Cool-down","100 m easy","rec")],
+      notes:["If someone can film two lengths today (side view and from the end), do it: it's your before photo."]}), L("A")],
+    [S("rest","Rest day", 0, {purpose:"Two days after the half. A walk is fine.", steps:[st("Optional","20–30 min walk","")]})],
+    [S("swim","Technique swim", 45, {m:1300, z:"drill", src:["watson"], purpose:"Technique, nothing else.",
+      steps:[st("Warm-up","300 m easy","rec"), st("Drill","8 × 50 m: 25 m fingertip drag, 25 m swim, 20 s rest","drill"), st("Main","5 × 100 m easy, 20 s rest","z2"), st("Cool-down","100 m easy","rec")]}), L("B"),
+     S("bike","First ride: bike set-up", 45, {z:"z2", src:["lorang"], purpose:"Get the bike right before the volume arrives.",
+      steps:[st("Set-up","Saddle height: about 25–35° of knee bend at the bottom of the stroke. Check cleats and tyre pressure.",""), st("Ride","30–40 min very easy, outdoors or on the trainer","z2")],
+      notes:["Book a proper bike fit before February, ideally including clip-on aero bars."]})],
+    [runEasy(30)],
+    [cssTest(true), L("C")],
+    [ftpTest(true)],
+    [runEasy(40, 4)]
+  ];
+}
+function wkTaper1(){
+  const L=s=>lift("maint", s, true);
+  const days=[
+    [S("swim","Race-pace set", 55, {m:2400, z:"race", key:true, src:["watson"], purpose:"Taper: less volume, same quality.",
+      steps:[st("Warm-up","400 m easy","rec"), st("Main","8 × 200 m at race pace, 20 s rest","race"), st("Speed","8 × 25 m fast","fast"), st("Cool-down","200 m easy","rec")]}), L("A")],
+    [S("bike","Race-intensity intervals", 75, {key:true, z:"race", src:["lorang"], purpose:"Race intervals at reduced volume.",
+      steps:[st("Warm-up","15 min building","z2"), st("Main","2 × 20 min at race power, 5 min easy","race"), st("Cool-down","Easy to finish","rec")]}), runOffBike(20, "race", "20 min: 10 min at race pace, 10 min easy")],
+    [swimEasy("Aerobic swim", 50), L("B"), runEasy(35, 4)],
+    [S("run","Race-pace run", 55, {key:true, z:"race", src:["lorang"], purpose:"Keep race pace familiar.",
+      steps:[st("Warm-up","15 min easy","z2"), st("Main","3 × 10 min at race pace, 2 min easy","race"), st("Cool-down","10 min easy","rec")]}), bikeEasy(40)],
+    [owSession("starts"), L("C")],
+    [S("bike","Last long brick: ride", 150, {key:true, z:"race", src:["watson"], purpose:"The last long session of the build.",
+      steps:[st("Ride","2:30 endurance","z2"), st("Race block","45 min at race power in the second half","race"), st("Fuelling","Race plan","")]}), runOffBike(30, "race", "30 min: 20 min at race pace, 10 min easy")],
+    [S("run","Long run with race-pace kilometres", 75, {key:true, z:"race", src:["lorang"], purpose:"The last alternating-kilometre run.",
+      steps:[st("Run","20 min easy","z2"), st("Alternating km","4 × (1 km at race pace + 1 km easy)","race"), st("Run","Easy to finish","z2")]})]
+  ];
+  addHeat(days, [1,5], false);
+  return days;
+}
+function wkTaper2(){
+  const L=s=>lift("maint", s, true);
+  const days=[
+    [S("swim","Race-pace set", 45, {m:1900, z:"race", src:["watson"], purpose:"Short and sharp.",
+      steps:[st("Warm-up","400 m easy","rec"), st("Main","6 × 200 m at race pace, 20 s rest","race"), st("Cool-down","300 m easy","rec")]}), L("A")],
+    [S("bike","Race-power intervals", 60, {key:true, z:"race", src:["lorang"], purpose:"Race power, small dose.",
+      steps:[st("Warm-up","15 min building","z2"), st("Main","3 × 10 min at race power, 4 min easy","race"), st("Cool-down","Easy to finish","rec")]}), runOffBike(15, "race", "15 min: 5 min easy, 5 min race pace, 5 min easy")],
+    [swimEasy("Easy swim", 45), L("B"), runEasy(30)],
+    [S("run","Race-pace run", 45, {key:true, z:"race", src:["lorang"], purpose:"Race pace stays familiar.",
+      steps:[st("Warm-up","15 min easy","z2"), st("Main","2 × 10 min at race pace, 2 min easy","race"), st("Cool-down","8 min easy","rec")]})],
+    [owSession("kit"), L("C")],
+    [S("bike","Short brick: ride", 105, {key:true, z:"race", src:["watson"], purpose:"Last brick.",
+      steps:[st("Ride","1:45 endurance","z2"), st("Race blocks","3 × 10 min at race power","race")]}), runOffBike(15, "race", "15 min at race pace")],
+    [S("run","Easy run with race pace", 60, {z:"race", src:["lorang"], purpose:"Easy, with a reminder of race pace.",
+      steps:[st("Run","60 min easy","z2"), st("Race pace","3 × 5 min at race pace in the middle","race")]})]
+  ];
+  addHeat(days, [1], false);
+  return days;
+}
+function wkRace(){
+  return [
+    [S("swim","Race-week swim", 35, {m:1400, z:"race", purpose:"Keep the feel: short and sharp.",
+      steps:[st("Warm-up","400 m easy","rec"), st("Main","4 × 100 m at race pace, 20 s rest; then 4 × 50 m fast, 20 s rest","race"), st("Cool-down","200 m easy","rec")]}), liftCustom("Mobility only", 20, "20 min mobility: hips, calves, upper back. No load.")],
+    [S("bike","Race-week openers", 50, {z:"race", purpose:"Wake the legs up without tiring them.",
+      steps:[st("Warm-up","15 min easy","z2"), st("Main","3 × 5 min at race power, 3 min easy; then 3 × 30 s quick","race"), st("Cool-down","Easy to finish","rec")]}), runOffBike(10)],
+    [S("swim","Open water in race kit", 30, {z:"race", src:["watson"], purpose:"Everything you'll wear on Sunday, one last time.",
+      steps:[st("Swim","20 min easy with 4 × 1 min at race pace","race"), st("Check","Goggles, wetsuit, anti-chafe, timing-chip strap","")]}), liftCustom("Activation", 15, "15 min band work: glute bridges, monster walks, band pull-aparts. No weights.")],
+    [S("run","Race-week openers", 30, {z:"race", purpose:"Short, with a little race pace.",
+      steps:[st("Warm-up","10 min easy","z2"), st("Main","4 × 1 min at race pace, 1 min easy","race"), st("Run","Easy to finish","z2")]})],
+    [S("rest","Rest and travel to Weymouth", 0, {purpose:"Travel day. Check the athlete guide for registration and bike-racking times.",
+      steps:[st("Pack","Use a checklist and lay everything out by discipline",""), st("Food","Normal meals with a little more carbohydrate. Nothing new.","")]}),
+     liftCustom("Slot released", 0, "No lifting today: rest.")],
+    [S("swim","Shake-out swim", 15, {z:"race", purpose:"Feel the water and the sighting points.", steps:[st("Swim","15 min in the bay if allowed, with 3 × 1 min at race pace","race")]}),
+     S("bike","Shake-out ride", 20, {z:"z2", purpose:"Check the bike works.", steps:[st("Ride","20 min easy with 3 × 1 min at race power; check gears and brakes","z2")]}),
+     S("run","Shake-out run", 10, {z:"z2", purpose:"Loosen up.", steps:[st("Run","10 min easy with 3 strides","z2")]})],
+    [S("race","IRONMAN 70.3 Weymouth", 329, {key:true, purpose:"Race day. Everything here has been rehearsed.",
+      steps:[st("Morning","Tested breakfast about 3 h before: 100–150 g carbohydrate, low fibre. Coffee if you normally have it.",""),
+        st("Swim 1.9 km","Seed yourself in the rolling start by goal time. First 200 m controlled, then race pace and find feet to follow.","race"),
+        st("T1","Wetsuit down to the waist on the way up the beach; helmet on before you touch the bike.",""),
+        st("Bike 90 km","First 15 min below race power. Then hold race power; on climbs allow the top of race intensity, never threshold. Eat and drink from 10 min in: 60–90 g carbohydrate and 500–750 ml fluid per hour.","race"),
+        st("T2","Shoes, race belt, cap, gels in pockets.",""),
+        st("Run 21.1 km","First 3 km at the slow end of race pace, even though it feels easy. Hold race pace to 16 km, then race what's left. Gel or cola at aid stations from 5 km.","race")],
+      notes:["Sub-5:30 budget: swim 0:44, T1 0:05, bike 2:50, T2 0:03, run 1:47. Your personal targets are on the Race day tab."]})]
+  ];
+}
+
+function buildWeek(w){
+  const t=typeOf(w), p=phaseOf(w).id, k=kOf(w);
+  if(w===1) return wkTransition();
+  if(w===46) return wkTaper1();
+  if(w===47) return wkTaper2();
+  if(w===48) return wkRace();
+  if(t==="test") return wkTest(w);
+  if(t==="recovery") return wkRecovery(w);
+  const days=[null, wkLoadP1, wkLoadP2, wkLoadP3, wkLoadP4, wkLoadP5][p](k);
+  if(w===12) days[4][0].notes = (days[4][0].notes||[]).concat(["Pools are often shut on New Year's Day: swim Thursday or Saturday instead."]);
+  if(w===44) days[4][0].notes = (days[4][0].notes||[]).concat(["Short this week: Saturday starts with a race-distance open-water swim."]);
+  return days;
+}
+const COUNTED = {swim:1, bike:1, run:1};
+function weekTotals(days){
+  const t={swim:0, bike:0, run:0, lifts:0, total:0};
+  days.forEach(arr => arr.forEach(s => { if(COUNTED[s.sport]){ t[s.sport]+=s.min; t.total+=s.min; } if(s.sport==="lift" && s.min>0) t.lifts++; }));
+  return t;
+}
+function buildPlan(){
+  const out=[];
+  for(let w=1; w<=48; w++){
+    const days=buildWeek(w);
+    days.forEach((arr,d) => arr.forEach((s,i) => { s.id="w"+w+"d"+d+"s"+i; }));
+    out.push({w, phase:phaseOf(w), type:typeOf(w), days, note:WEEKNOTES[w]||""});
+  }
+  return out;
+}
+/*PLAN-END*/
+
+/* ---------------- Interface ---------------- */
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MON3=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const DAY3=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const SPORTNAME={swim:"Swim", bike:"Bike", run:"Run", lift:"Lift (reserved slot)", heat:"Heat", rest:"Rest", race:"Race"};
+const SRC={lorang:"Dan Lorang", plews:"Dan Plews", watson:"Lance Watson", bu:"Bu and Blummenfelt"};
+const STORE_KEY="weymouth703:v1";
+const $=id=>document.getElementById(id);
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+let store={done:{}, nums:{}};
+try{ const raw=localStorage.getItem(STORE_KEY); if(raw){ const o=JSON.parse(raw); if(o&&typeof o==="object"){ store.done=o.done||{}; store.nums=o.nums||{}; } } }catch(e){}
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){} }
+["ftp","tpace","css","hrmax"].forEach(k=>{ const v=Number(store.nums[k]); N[k]= isFinite(v) && v>0 ? v : null; });
+
+const PLAN=buildPlan();
+const state={week:1, day:0, open:new Set(), allOpen:false};
+
+function todayLocal(){ const t=new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
+function dayIndexToday(){ return Math.round((todayLocal()-dateOf(1,0))/86400000); }
+function goToday(){
+  const i=dayIndexToday();
+  if(i<0){ state.week=1; state.day=0; } else if(i>335){ state.week=48; state.day=6; } else { state.week=Math.floor(i/7)+1; state.day=i%7; }
+}
+function fmtShort(d){ return d.getDate()+" "+MON3[d.getMonth()]; }
+function fmtLong(d){ return DAYS[(d.getDay()+6)%7]+" "+d.getDate()+" "+MONTHS[d.getMonth()]+" "+d.getFullYear(); }
+function isSameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+/* Targets */
+function fmtClock(sec){ sec=Math.round(sec); const h=Math.floor(sec/3600), m=Math.floor(sec%3600/60), x=sec%60; return (h? h+":"+String(m).padStart(2,"0") : String(m))+":"+String(x).padStart(2,"0"); }
+function sgn(n){ return (n>=0?"+":"−")+Math.abs(n); }
+function hrRange(z){ const r=Z[z]&&Z[z].hr; if(!r||!N.hrmax) return ""; return "HR "+Math.round(N.hrmax*r[0]/100)+"–"+Math.round(N.hrmax*r[1]/100); }
+function target(sport, z){
+  if(!z || !Z[z]) return null;
+  const zz=Z[z]; let val="", sub=[];
+  if(sport==="bike" && BIKE[z]){
+    const r=BIKE[z];
+    if(N.ftp){ val=Math.round(N.ftp*r[0]/100)+"–"+Math.round(N.ftp*r[1]/100)+" W"; sub.push(r[0]+"–"+r[1]+"% FTP"); }
+    else val=r[0]+"–"+r[1]+"% FTP";
+    if(z==="lc") sub.push("60–70 rpm");
+  } else if(sport==="run"){
+    if(RUN[z] && N.tpace){ const r=RUN[z]; val=fmtPace(N.tpace*r[0])+"–"+fmtPace(N.tpace*r[1])+" /km"; }
+    else val=RUNDESC[z]||"";
+  } else if(sport==="swim" && SWIM[z]){
+    const r=SWIM[z];
+    val = N.css ? fmtPace(N.css+r[0])+"–"+fmtPace(N.css+r[1])+" /100 m" : "CSS "+sgn(r[0])+" to "+sgn(r[1])+" s per 100 m";
+  } else if(z==="drill"){ val="Form over speed"; }
+  else if(z==="fast"){ val="Quick and relaxed"; }
+  else if(z==="hill"){ val="Hard but controlled"; }
+  if(zz.rpe) sub.push("RPE "+zz.rpe);
+  const h=hrRange(z); if(h && z!=="drill" && z!=="fast") sub.push(h);
+  return {name:zz.name, val, sub:sub.join(", ")};
+}
+function stepSport(sess, step){
+  if(sess.sport==="race"){ const s=step.s.toLowerCase(); if(s.startsWith("swim")) return "swim"; if(s.startsWith("bike")) return "bike"; if(s.startsWith("run")) return "run"; }
+  return sess.sport;
+}
+
+/* Profile */
+function renderProfile(){
+  const W=20, H=140, top=14, max=900;
+  let s="";
+  [4,8,12].forEach(h=>{ const y=top+H-h*60/max*H; s+='<line class="gridline" x1="0" x2="960" y1="'+y.toFixed(1)+'" y2="'+y.toFixed(1)+'"/>'; });
+  PHASES.forEach((p,i)=>{ const x=(p.from-1)*W, w=(p.to-p.from+1)*W; s+='<rect class="band '+(i%2?'b2':'b1')+'" x="'+x+'" y="'+(top+H+8)+'" width="'+w+'" height="22"/>'; if(p.label && w>=80) s+='<text class="bandtxt" x="'+(x+6)+'" y="'+(top+H+23)+'">'+esc(p.label)+'</text>'; });
+  PLAN.forEach((wk,i)=>{
+    const t=weekTotals(wk.days); let y=top+H; const x=i*W+3;
+    [["swim",t.swim],["bike",t.bike],["run",t.run]].forEach(([sp,m])=>{ const h=m/max*H; y-=h; s+='<rect class="bar '+sp+'" x="'+x+'" y="'+y.toFixed(1)+'" width="'+(W-6)+'" height="'+h.toFixed(1)+'"/>'; });
+  });
+  let lastM=-1;
+  for(let i=0;i<48;i++){ for(let d=0;d<7;d++){ const dt=dateOf(i+1,d); if(dt.getDate()===1 || (i===0&&d===0)){ if(dt.getMonth()!==lastM){ lastM=dt.getMonth(); const x=i*W+d/7*W; s+='<text class="mon" x="'+x.toFixed(1)+'" y="'+(top+H+46)+'">'+MON3[dt.getMonth()]+(dt.getMonth()===0?" 2027":"")+'</text>'; } } } }
+  const ti=dayIndexToday();
+  if(ti>=0 && ti<=335){ const x=ti/7*W; s+='<line class="todayline" x1="'+x.toFixed(1)+'" x2="'+x.toFixed(1)+'" y1="'+(top-6)+'" y2="'+(top+H)+'"/>'; }
+  s+='<line class="pole" x1="957" x2="957" y1="2" y2="'+(top+H)+'"/><path class="flag" d="M957 2 L943 7 L957 12 Z"/>';
+  [4,8,12].forEach(h=>{ const y=top+H-h*60/max*H; s+='<text class="gridtxt" x="2" y="'+(y-3).toFixed(1)+'">'+h+' h</text>'; });
+  PLAN.forEach((wk,i)=>{ const t=weekTotals(wk.days); s+='<rect class="hit'+(wk.w===state.week?' sel':'')+'" data-week="'+wk.w+'" x="'+(i*W)+'" y="'+(top-6)+'" width="'+W+'" height="'+(H+8)+'"><title>Week '+wk.w+', '+fmtShort(dateOf(wk.w,0))+': '+fmtHM(t.total)+' ('+esc(TYPE_LABEL[wk.type].toLowerCase())+')</title></rect>'; });
+  $("profile").innerHTML=s;
+  const sc=document.querySelector(".profile-scroll");
+  if(sc && sc.scrollWidth>sc.clientWidth+4){ const x=(state.week-0.5)/48*sc.scrollWidth; if(x<sc.scrollLeft+20 || x>sc.scrollLeft+sc.clientWidth-20) sc.scrollLeft=Math.max(0,x-sc.clientWidth/2); }
+}
+
+/* Week */
+function renderWeekSel(){
+  $("weekSel").innerHTML=PLAN.map(wk=>'<option value="'+wk.w+'">Week '+wk.w+': '+fmtShort(dateOf(wk.w,0))+'</option>').join("");
+}
+function renderWeek(){
+  const wk=PLAN[state.week-1], t=weekTotals(wk.days);
+  $("weekSel").value=String(wk.w);
+  const start=dateOf(wk.w,0), end=dateOf(wk.w,6);
+  let doneN=0, allN=0; wk.days.forEach(a=>a.forEach(s=>{ if(s.sport!=="rest" && s.min>0){ allN++; if(store.done[s.id]) doneN++; } }));
+  const why=[wk.phase.why, TYPE_WHY[wk.type]].filter(Boolean).join(" ");
+  $("weekhead").innerHTML=
+    '<div><h2>Week '+wk.w+' of 48<span class="dates">'+fmtShort(start)+' to '+fmtShort(end)+' '+end.getFullYear()+'</span></h2>'+
+    '<p class="phase-line">'+esc(wk.phase.name)+'<span class="typepill '+wk.type+'">'+esc(TYPE_LABEL[wk.type])+'</span></p></div>'+
+    '<div class="totals">'+[["Swim","swim",t.swim],["Bike","bike",t.bike],["Run","run",t.run],["Total","",t.total]].map(a=>'<div><div class="lab'+(a[1]?' k" style="--c:var(--'+a[1]+')':'')+'">'+a[0]+'</div><div class="val">'+fmtHM(a[2])+'</div></div>').join("")+'</div>'+
+    '<p class="why">'+esc(why)+'</p>'+
+    (wk.note ? '<p class="weeknote">'+esc(wk.note)+'</p>' : '')+
+    '<p class="progress">'+t.lifts+' lifting slot'+(t.lifts===1?'':'s')+' reserved on top. Done so far this week: '+doneN+' of '+allN+'.</p>';
+  renderDays();
+}
+function renderDays(){
+  const wk=PLAN[state.week-1], today=todayLocal();
+  $("days").innerHTML=wk.days.map((arr,d)=>{
+    const dt=dateOf(wk.w,d), counted=arr.filter(s=>COUNTED[s.sport]), mins=counted.reduce((a,s)=>a+s.min,0);
+    const bars=arr.filter(s=>s.min>0 && s.sport!=="rest").map(s=>'<span class="'+(COUNTED[s.sport]||s.sport==="race"?'':'light')+'" style="--c:var(--'+s.sport+');width:'+Math.max(8,Math.min(100,s.min/240*100)).toFixed(0)+'%"></span>').join("");
+    const n=arr.filter(s=>s.sport!=="rest"&&s.min>0).length, dn=arr.filter(s=>store.done[s.id]).length;
+    return '<button class="daybtn" role="tab" id="day-'+d+'" aria-selected="'+(d===state.day)+'" aria-controls="daydetail" data-day="'+d+'">'+
+      '<span class="dn">'+DAY3[d]+' '+dt.getDate()+'</span>'+
+      (isSameDay(dt,today)?'<span class="todaytag">Today</span>':'<span class="dd">'+MON3[dt.getMonth()]+'</span>')+
+      '<span class="mini">'+(bars||'<span class="dd" style="height:auto;background:none">Rest</span>')+'</span>'+
+      '<span class="tot"><b>'+(mins?fmtHM(mins):(arr.some(s=>s.sport==="race")?"Race":"–"))+'</b><span>'+(n?dn+'/'+n:'')+'</span></span>'+
+    '</button>';
+  }).join("");
+  const strip=$("days"), b=$("day-"+state.day);
+  if(strip && b && strip.scrollWidth>strip.clientWidth+4){ const l=b.offsetLeft, r=l+b.offsetWidth; if(l<strip.scrollLeft || r>strip.scrollLeft+strip.clientWidth) strip.scrollLeft=Math.max(0,l-strip.clientWidth/2+b.offsetWidth/2); }
+  renderDay();
+}
+function sessHTML(s){
+  const open=state.open.has(s.id), done=!!store.done[s.id];
+  const meta=[];
+  meta.push('<span>'+esc(SPORTNAME[s.sport])+'</span>');
+  if(s.z && Z[s.z] && s.sport!=="lift") meta.push('<span>'+esc(Z[s.z].name)+'</span>');
+  if(s.m) meta.push('<span>'+s.m.toLocaleString("en-GB")+' m</span>');
+  if(s.key) meta.push('<span class="keytag">Key session</span>');
+  const canCheck=s.sport!=="rest" && s.min>0;
+  let body="";
+  if(open){
+    body+='<div class="sess-body" id="b-'+s.id+'">';
+    if(s.purpose) body+='<p class="purpose">'+esc(s.purpose)+'</p>';
+    if(s.steps.length){
+      const hasT=s.steps.some(x=>x.z);
+      body+='<div class="steps"><div class="h">Part</div><div class="h">What to do</div><div class="h tgt">'+(hasT?'Target':'')+'</div>';
+      s.steps.forEach(x=>{
+        const tg=target(stepSport(s,x), x.z);
+        body+='<div class="part">'+esc(x.s)+'</div><div class="det">'+esc(x.x)+(x.n?'<div class="n">'+esc(x.n)+'</div>':'')+'</div>'+
+          '<div class="tgt">'+(tg?'<div class="tz">'+esc(tg.name)+'</div>'+(tg.val?'<div class="tv">'+esc(tg.val)+'</div>':'')+(tg.sub?'<div class="ts">'+esc(tg.sub)+'</div>':''):'')+'</div>';
+      });
+      body+='</div>';
+    }
+    if(s.notes && s.notes.length) body+='<ul class="notes">'+s.notes.map(n=>'<li>'+esc(n)+'</li>').join("")+'</ul>';
+    if(s.src && s.src.length) body+='<div class="method">Grounded in '+s.src.map(k=>'<span class="chip">'+esc(SRC[k])+'</span>').join("")+'</div>';
+    body+='</div>';
+  }
+  return '<article class="sess sport-'+s.sport+(done?' done':'')+'">'+
+    '<div class="sess-head">'+
+      (canCheck?'<label class="sess-check"><input type="checkbox" data-done="'+s.id+'" '+(done?'checked':'')+' aria-label="Mark '+esc(s.title)+' as done"></label>':'<span class="sess-check" style="width:36px"></span>')+
+      '<button class="sess-toggle" data-open="'+s.id+'" aria-expanded="'+open+'" aria-controls="b-'+s.id+'">'+
+        '<span><span class="sess-title">'+esc(s.title)+'</span><span class="sess-meta">'+meta.join("")+'</span></span>'+
+        '<span class="sess-dur">'+(s.min>0?fmtDur(s.min):'')+'</span>'+
+        '<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>'+
+      '</button>'+
+    '</div>'+body+'</article>';
+}
+function renderDay(){
+  const wk=PLAN[state.week-1], arr=wk.days[state.day], dt=dateOf(wk.w,state.day);
+  $("dayTitle").textContent=fmtLong(dt);
+  const by={swim:0,bike:0,run:0}; arr.forEach(s=>{ if(COUNTED[s.sport]) by[s.sport]+=s.min; });
+  const parts=[]; if(by.swim) parts.push("swim "+fmtDur(by.swim)); if(by.bike) parts.push("bike "+fmtDur(by.bike)); if(by.run) parts.push("run "+fmtDur(by.run));
+  const lifts=arr.filter(s=>s.sport==="lift"&&s.min>0).length;
+  $("daySum").textContent = parts.length ? ("Training: "+parts.join(", ")+(lifts?". Plus a reserved lifting slot.":".")) : (arr.some(s=>s.sport==="race")?"Race day.":"No swim, bike or run today.");
+  $("sessions").innerHTML=arr.length?arr.map(sessHTML).join(""):'<p class="empty">Nothing scheduled.</p>';
+  const allOpen=arr.length && arr.every(s=>state.open.has(s.id));
+  $("expandAll").textContent=allOpen?"Collapse all":"Expand all";
+  $("prevDay").disabled = state.week===1 && state.day===0;
+  $("nextDay").disabled = state.week===48 && state.day===6;
+  $("prevWeek").disabled = state.week===1; $("nextWeek").disabled = state.week===48;
+}
+function setWeek(w, keepDay){ state.week=Math.max(1,Math.min(48,w)); if(!keepDay) state.day=0; renderProfile(); renderWeek(); }
+function moveDay(delta){
+  let i=(state.week-1)*7+state.day+delta; i=Math.max(0,Math.min(335,i));
+  const w=Math.floor(i/7)+1, d=i%7;
+  if(w!==state.week){ state.week=w; state.day=d; renderProfile(); renderWeek(); } else { state.day=d; renderDays(); }
+}
+
+/* Countdown */
+function renderCountdown(){
+  const t=todayLocal(), race=dateOf(48,6), start=dateOf(1,0);
+  const toRace=Math.round((race-t)/86400000), toStart=Math.round((start-t)/86400000);
+  let txt;
+  if(toStart>0) txt="Plan starts Monday 12 October, in "+toStart+" day"+(toStart===1?"":"s")+". Race day is "+toRace+" days away.";
+  else if(toRace>0){ const w=Math.floor(dayIndexToday()/7)+1; txt="Week "+w+" of 48. Race day is "+toRace+" day"+(toRace===1?"":"s")+" away."; }
+  else if(toRace===0) txt="It's race day. Go and have the day you trained for.";
+  else txt="Race done. Time for some rest.";
+  $("countdown").textContent=txt;
+}
+
+/* Numbers */
+function parseTime(str){
+  if(!str) return null; const p=String(str).trim().split(":").map(x=>x.trim());
+  if(p.some(x=>x===""||isNaN(Number(x)))) return null;
+  let s=0; p.forEach(x=>{ s=s*60+Number(x); }); return s>0?s:null;
+}
+function syncInputs(){
+  $("ftp").value=N.ftp||""; $("tpace").value=N.tpace?fmtPace(N.tpace):""; $("css").value=N.css?fmtPace(N.css):""; $("hrmax").value=N.hrmax||"";
+}
+function setNum(k, v){
+  N[k]= (v && isFinite(v) && v>0) ? v : null;
+  store.nums[k]=N[k]; save();
+  $("savedNote").textContent="Saved. Every target in the plan now uses these numbers.";
+  renderZones(); renderRaceTargets(); renderDay();
+}
+function renderZones(){
+  const rows=[["rec"],["z2"],["lt1"],["race"],["nt1"],["nt2"],["thr"],["vo2"]];
+  let h='<thead><tr><th>Zone</th><th>Bike</th><th>Run</th><th>Swim</th><th>Effort</th></tr></thead><tbody>';
+  rows.forEach(([z])=>{
+    const b=target("bike",z), r=target("run",z), sw=SWIM[z]?target("swim",z):null;
+    h+='<tr><td>'+esc(Z[z].name)+'</td><td>'+esc(b?b.val:"")+'</td><td>'+esc(r?r.val:"")+'</td><td>'+esc(sw?sw.val:"–")+'</td><td>RPE '+esc(Z[z].rpe)+(N.hrmax&&Z[z].hr?'<br><span class="savednote">'+esc(hrRange(z))+'</span>':'<br><span class="savednote">'+Z[z].hr[0]+'–'+Z[z].hr[1]+'% max HR</span>')+'</td></tr>';
+  });
+  h+='</tbody>';
+  $("zoneTable").innerHTML=h;
+}
+function renderPhaseTable(){
+  let h='<thead><tr><th>Phase</th><th>Weeks</th><th>Dates</th><th>Target mix (easy / moderate / hard)</th></tr></thead><tbody>';
+  PHASES.forEach(p=>{ h+='<tr><td>'+esc(p.name)+'</td><td>'+p.from+(p.to!==p.from?'–'+p.to:'')+'</td><td>'+fmtShort(dateOf(p.from,0))+' to '+fmtShort(dateOf(p.to,6))+'</td><td>'+esc(p.mix)+'</td></tr>'; });
+  $("phaseTable").innerHTML=h+'</tbody>';
+}
+function renderRaceTargets(){
+  const out=[];
+  if(N.ftp){ out.push('<li><strong>Bike race power:</strong> '+Math.round(N.ftp*0.78)+'–'+Math.round(N.ftp*0.84)+' W (78–84% of your '+N.ftp+' W FTP). Start at the low end; the race-power check in week 43 decides where in the range you sit.</li>'); }
+  else out.push('<li><strong>Bike race power:</strong> 78–84% of FTP. Add your FTP on the Your numbers tab to see watts.</li>');
+  let swimS=null, runS=null;
+  if(N.css){ const lo=N.css+3, hi=N.css+6; swimS=[19*lo,19*hi]; out.push('<li><strong>Swim:</strong> '+fmtPace(lo)+'–'+fmtPace(hi)+' per 100 m pool-equivalent, about '+fmtClock(swimS[0])+'–'+fmtClock(swimS[1])+' for 1.9 km. A wetsuit usually helps; chop and sighting take some of that back.</li>'); }
+  else out.push('<li><strong>Swim:</strong> CSS +3 to +6 s per 100 m. Add your CSS to see paces and an estimated swim time.</li>');
+  if(N.tpace){ const lo=N.tpace*1.08, hi=N.tpace*1.12; runS=[21.0975*lo,21.0975*hi]; out.push('<li><strong>Run:</strong> '+fmtPace(lo)+'–'+fmtPace(hi)+' per km, about '+fmtClock(runS[0])+'–'+fmtClock(runS[1])+' for the half marathon off the bike.</li>'); }
+  else out.push('<li><strong>Run:</strong> 8–12% slower than your threshold pace. Add threshold pace to see the numbers.</li>');
+  if(swimS && runS){
+    const mid=(swimS[0]+swimS[1])/2 + (runS[0]+runS[1])/2 + 8*60;
+    const bike=330*60 - mid;
+    out.push('<li><strong>What that leaves for the bike:</strong> with mid-range swim and run times and 8 minutes of transitions, you need a bike split of '+(bike>0?fmtClock(bike):"(not possible)")+' or faster to go under 5:30'+(bike>0?' (about '+(90/(bike/3600)).toFixed(1)+' km/h average)':'')+'.</li>');
+  }
+  if(N.hrmax) out.push('<li><strong>Heart rate:</strong> bike around '+Math.round(N.hrmax*0.80)+'–'+Math.round(N.hrmax*0.85)+'; run sits about 5 beats higher at the same effort.</li>');
+  $("raceTargets").innerHTML='<ul>'+out.join("")+'</ul>';
+}
+
+/* Tabs */
+function showTab(id){
+  ["plan","numbers","race","method"].forEach(t=>{ const on=t===id; $("tab-"+t).setAttribute("aria-selected", on); $("view-"+t).hidden=!on; });
+}
+
+/* Events */
+function init(){
+  goToday();
+  renderCountdown(); renderWeekSel(); renderProfile(); renderWeek(); syncInputs(); renderZones(); renderPhaseTable(); renderRaceTargets();
+
+  ["plan","numbers","race","method"].forEach(t=>$("tab-"+t).addEventListener("click",()=>showTab(t)));
+  $("profile").addEventListener("click",e=>{ const r=e.target.closest("[data-week]"); if(r) setWeek(Number(r.getAttribute("data-week"))); });
+  $("weekSel").addEventListener("change",e=>setWeek(Number(e.target.value)));
+  $("prevWeek").addEventListener("click",()=>setWeek(state.week-1));
+  $("nextWeek").addEventListener("click",()=>setWeek(state.week+1));
+  $("todayBtn").addEventListener("click",()=>{ goToday(); renderProfile(); renderWeek(); });
+  $("prevDay").addEventListener("click",()=>moveDay(-1));
+  $("nextDay").addEventListener("click",()=>moveDay(1));
+  $("days").addEventListener("click",e=>{ const b=e.target.closest("[data-day]"); if(b){ state.day=Number(b.getAttribute("data-day")); renderDays(); } });
+  $("days").addEventListener("keydown",e=>{
+    if(e.key!=="ArrowLeft" && e.key!=="ArrowRight") return;
+    e.preventDefault(); moveDay(e.key==="ArrowLeft"?-1:1); const b=$("day-"+state.day); if(b) b.focus();
+  });
+  $("expandAll").addEventListener("click",()=>{
+    const arr=PLAN[state.week-1].days[state.day]; const allOpen=arr.every(s=>state.open.has(s.id));
+    arr.forEach(s=>{ if(allOpen) state.open.delete(s.id); else state.open.add(s.id); }); renderDay();
+  });
+  $("sessions").addEventListener("click",e=>{
+    const b=e.target.closest("[data-open]"); if(!b) return;
+    const id=b.getAttribute("data-open"); if(state.open.has(id)) state.open.delete(id); else state.open.add(id);
+    renderDay(); const nb=document.querySelector('[data-open="'+id+'"]'); if(nb) nb.focus();
+  });
+  $("sessions").addEventListener("change",e=>{
+    const c=e.target.closest("[data-done]"); if(!c) return;
+    const id=c.getAttribute("data-done"); if(c.checked) store.done[id]=true; else delete store.done[id]; save();
+    renderWeek(); const nc=document.querySelector('[data-done="'+id+'"]'); if(nc) nc.focus();
+  });
+  document.addEventListener("keydown",e=>{
+    if($("view-plan").hidden) return;
+    const tag=(document.activeElement&&document.activeElement.tagName)||"";
+    if(/INPUT|SELECT|TEXTAREA/.test(tag) || e.target.closest && e.target.closest("#days")) return;
+    if(e.key==="ArrowLeft"){ moveDay(-1); } else if(e.key==="ArrowRight"){ moveDay(1); }
+  });
+
+  $("ftp").addEventListener("change",e=>setNum("ftp", Number(e.target.value)));
+  $("hrmax").addEventListener("change",e=>setNum("hrmax", Number(e.target.value)));
+  $("tpace").addEventListener("change",e=>{ const v=parseTime(e.target.value); setNum("tpace", v); syncInputs(); });
+  $("css").addEventListener("change",e=>{ const v=parseTime(e.target.value); setNum("css", v); syncInputs(); });
+  $("useP20").addEventListener("click",()=>{ const p=Number($("p20").value); if(p>0){ setNum("ftp", Math.round(p*0.95)); syncInputs(); } });
+  $("useRace").addEventListener("click",()=>{
+    const dist=Number($("rdist").value), t=parseTime($("rtime").value);
+    if(!t){ $("raceRes").textContent="Enter the time as h:mm:ss (or mm:ss for 5 km and 10 km)."; return; }
+    const pace=t/dist, tp=pace*Math.pow(60/(t/60),0.06);
+    setNum("tpace", tp); syncInputs();
+    $("raceRes").textContent="Race pace "+fmtPace(pace)+" /km gives a threshold pace of about "+fmtPace(tp)+" /km (projected to a one-hour effort).";
+  });
+  $("useCss").addEventListener("click",()=>{
+    const dA=Number($("cssA").value), dB=Number($("cssB").value), tA=parseTime($("cssTA").value), tB=parseTime($("cssTB").value);
+    if(!tA||!tB||dA<=dB||tA<=tB) return;
+    setNum("css", (tA-tB)/((dA-dB)/100)); syncInputs();
+  });
+}
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init); else init();
+</script>
+</body>
+</html>
