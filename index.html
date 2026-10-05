@@ -7,6 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..850&display=swap" rel="stylesheet">
+<!-- CLOUD CONFIGURATION: paste your project URL and PUBLIC publishable key here. -->
+<script>
+window.WEYMOUTH_CLOUD = {
+  url: "https://voaashupuoqiewmqlaer.supabase.co",
+  publishableKey: "sb_publishable_-znMA2Mox0KOPK2GXR1How__GxBqyxa"
+};
+</script>
 <style>
 :root{
   --paper:#EDF2F1; --panel:#F8FBFA; --ink:#13242B; --muted:#55666C; --rule:#CBD8D7; --rule-strong:#9DB0B0;
@@ -205,6 +212,16 @@ table.z td:first-child{font-weight:600}
   .steps .tgt{grid-column:1;padding-top:2px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Account and progress sync */
+.sync-panel{margin:20px 0 8px;padding:16px;border:1px solid var(--rule);border-radius:8px;background:var(--panel)}
+.sync-panel h2{font-size:1rem;margin:0 0 6px}
+.sync-panel p{margin:6px 0;font-size:.9rem;color:var(--muted);overflow-wrap:anywhere}
+.sync-form,.sync-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin-top:12px}
+.sync-form label{display:flex;flex-direction:column;gap:4px;font-size:.9rem;flex:1 1 180px}
+.sync-form input{width:100%;min-width:0;padding:9px;border:1px solid var(--rule-strong);border-radius:4px;background:var(--paper);color:var(--ink);font:inherit}
+.sync-actions .btn{max-width:100%;white-space:normal}
+.sync-form button:disabled{opacity:.6;cursor:wait}
 </style>
 </head>
 <body>
@@ -225,6 +242,33 @@ table.z td:first-child{font-weight:600}
 </header>
 
 <main class="wrap">
+  <section class="sync-panel" aria-labelledby="syncHeading">
+    <h2 id="syncHeading">Your progress, across devices</h2>
+    <p id="syncStatus" role="status" aria-live="polite">Loading saved progress…</p>
+    <form id="loginForm" class="sync-form">
+      <label for="signInEmail">Email<input id="signInEmail" type="email" autocomplete="username" required></label>
+      <label for="signInPassword">Password<input id="signInPassword" type="password" autocomplete="current-password" required></label>
+      <button class="btn" id="signInButton" type="submit">Sign in</button>
+    </form>
+    <div id="accountControls" hidden>
+      <p>Signed in as <strong id="accountEmail"></strong></p>
+      <div class="sync-actions">
+        <button class="btn" id="syncNow" type="button">Sync now</button>
+        <button class="btn" id="importBrowserProgress" type="button">Import this browser’s progress</button>
+        <button class="btn quiet" id="signOutButton" type="button">Sign out</button>
+      </div>
+    </div>
+    <details>
+      <summary>Back up or move progress</summary>
+      <p>Export before moving to a different website address. Import merges completed sessions and replaces any benchmark numbers included in the backup.</p>
+      <div class="sync-actions">
+        <button class="btn" id="exportProgress" type="button">Export progress</button>
+        <label class="btn" for="importProgress">Import backup</label>
+        <input id="importProgress" type="file" accept="application/json,.json" hidden>
+      </div>
+    </details>
+  </section>
+
   <!-- PLAN -->
   <section id="view-plan" role="tabpanel" aria-labelledby="tab-plan">
     <div class="profile">
@@ -261,7 +305,7 @@ table.z td:first-child{font-weight:600}
   <!-- NUMBERS -->
   <section id="view-numbers" class="page" role="tabpanel" aria-labelledby="tab-numbers" hidden>
     <h2>Your numbers</h2>
-    <p class="lede">Enter your test results and every session in the plan shows real targets: watts, run paces and swim paces instead of percentages. Update them after each benchmark week (weeks 9, 19, 27, 35 and 43). They are saved in this browser.</p>
+    <p class="lede">Enter your test results and every session in the plan shows real targets: watts, run paces and swim paces instead of percentages. Update them after each benchmark week (weeks 9, 19, 27, 35 and 43). They sync across devices when you are signed in. Signed-out updates stay in this browser.</p>
     <div class="cols">
       <div>
         <h3>Bike: FTP</h3>
@@ -1212,7 +1256,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;
 
 let store={done:{}, nums:{}};
 try{ const raw=localStorage.getItem(STORE_KEY); if(raw){ const o=JSON.parse(raw); if(o&&typeof o==="object"){ store.done=o.done||{}; store.nums=o.nums||{}; } } }catch(e){}
-function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){} }
+
 ["ftp","tpace","css","hrmax"].forEach(k=>{ const v=Number(store.nums[k]); N[k]= isFinite(v) && v>0 ? v : null; });
 
 const PLAN=buildPlan();
@@ -1396,8 +1440,8 @@ function syncInputs(){
 }
 function setNum(k, v){
   N[k]= (v && isFinite(v) && v>0) ? v : null;
-  store.nums[k]=N[k]; save();
-  $("savedNote").textContent="Saved. Every target in the plan now uses these numbers.";
+  store.nums[k]=N[k]; save("nums",k,N[k]);
+  $("savedNote").textContent="Targets updated. Check the progress status above for cloud saving.";
   renderZones(); renderRaceTargets(); renderDay();
 }
 function renderZones(){
@@ -1438,6 +1482,160 @@ function showTab(id){
   ["plan","numbers","race","method"].forEach(t=>{ const on=t===id; $("tab-"+t).setAttribute("aria-selected", on); $("view-"+t).hidden=!on; });
 }
 
+/* Cloud progress: per-account cache, per-field writes, and offline retry. */
+const cloud = {client:null, user:null, epoch:0, busy:false, again:false, timer:null, pending:{}, seq:0, cacheOK:true};
+const NUMBER_KEYS = ['ftp','tpace','css','hrmax'];
+function cleanProgress(o){
+  const out={done:{},nums:{}};
+  if(!o || typeof o!=='object') return out;
+  for(const [k,v] of Object.entries(o.done||{})) if(/^w\d+d[0-6]s\d+$/.test(k) && v===true) out.done[k]=true;
+  for(const k of NUMBER_KEYS) if(Object.hasOwn(o.nums||{},k)){
+    const v=o.nums[k]; out.nums[k]=typeof v==='number' && Number.isFinite(v) && v>0 ? v : null;
+  }
+  return out;
+}
+function readCache(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch{return null;}}
+function cacheKey(){return cloud.user ? STORE_KEY+':account:'+cloud.user.id : STORE_KEY;}
+function persistProgress(){
+  try{localStorage.setItem(cacheKey(),JSON.stringify({...store,pending:cloud.pending}));cloud.cacheOK=true;}
+  catch{cloud.cacheOK=false;setSyncStatus('Browser storage is unavailable. Keep this page open until cloud saving succeeds.');}
+}
+function setSyncStatus(message){$('syncStatus').textContent=message;}
+function applyValue(kind,key,value){
+  if(kind==='done'){if(value===true) store.done[key]=true;else delete store.done[key];}
+  else if(NUMBER_KEYS.includes(key)) store.nums[key]=typeof value==='number' && value>0 ? value : null;
+}
+function refreshProgress(){
+  NUMBER_KEYS.forEach(k=>{N[k]=store.nums[k]||null;});
+  // Do not replace a partly typed benchmark with a background refresh.
+  if(!NUMBER_KEYS.includes(document.activeElement?.id)) syncInputs();
+  renderWeek();renderZones();renderRaceTargets();
+}
+function queueChange(kind,key,value){
+  if(cloud.user){cloud.pending[kind+':'+key]={kind,key,value,seq:++cloud.seq};}
+  persistProgress();
+  if(!cloud.user){setSyncStatus('Saved in this browser. Sign in to sync across devices.');return;}
+  setSyncStatus(navigator.onLine?'Waiting to sync…':'Offline. Changes will sync when you reconnect.');
+  clearTimeout(cloud.timer); cloud.timer=setTimeout(syncCloud,400);
+}
+function save(kind,key,value){queueChange(kind,key,value);}
+async function syncCloud(){
+  if(!cloud.client || !cloud.user) return;
+  if(cloud.busy){cloud.again=true;return;}
+  if(!navigator.onLine){setSyncStatus('Offline. Changes will sync when you reconnect.');return;}
+  cloud.busy=true; cloud.again=false;
+  const uid=cloud.user.id, epoch=cloud.epoch;
+  const current=()=>cloud.user?.id===uid && cloud.epoch===epoch;
+  try{
+    const batch=Object.entries(cloud.pending).map(([id,item])=>[id,{...item}]);
+    setSyncStatus(batch.length?'Saving to cloud…':'Checking for updates…');
+    if(batch.length){
+      const rows=batch.map(([,item])=>({user_id:uid,kind:item.kind,key:item.key,value:item.value}));
+      const {error}=await cloud.client.from('weymouth_progress').upsert(rows,{onConflict:'user_id,kind,key'});
+      if(error) throw error;
+      if(!current()) return;
+      for(const [id,item] of batch) if(cloud.pending[id]?.seq===item.seq) delete cloud.pending[id];
+      persistProgress();
+    }
+    // Fetch after writes; pending local edits always win over this snapshot.
+    const {data,error}=await cloud.client.from('weymouth_progress').select('kind,key,value').eq('user_id',uid).limit(5000);
+    if(error) throw error;
+    if(!current()) return;
+    for(const row of data||[]){
+      if(cloud.pending[row.kind+':'+row.key]) continue;
+      if(row.kind==='done' && /^w\d+d[0-6]s\d+$/.test(row.key)) applyValue(row.kind,row.key,row.value);
+      if(row.kind==='nums' && NUMBER_KEYS.includes(row.key)) applyValue(row.kind,row.key,row.value);
+    }
+    persistProgress();refreshProgress();
+    setSyncStatus(Object.keys(cloud.pending).length?'More changes waiting to sync…':
+      (cloud.cacheOK?'Synced at '+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'.':'Saved to cloud. Browser backup is unavailable.'));
+  }catch(error){if(current()) setSyncStatus('Could not sync. '+error.message+' Your changes are waiting; use Sync now to retry.');}
+  finally{cloud.busy=false;if(cloud.again || (current() && Object.keys(cloud.pending).length && navigator.onLine)){
+    clearTimeout(cloud.timer);cloud.timer=setTimeout(syncCloud,cloud.again?0:15000);
+  }}
+}
+function changeAccount(session){
+  const next=session?.user||null;
+  if(cloud.user?.id===next?.id){if(next) syncCloud();return;}
+  cloud.epoch++;clearTimeout(cloud.timer);cloud.user=next;cloud.pending={};
+  const cached=readCache(cacheKey());store=cleanProgress(cached);
+  for(const item of Object.values(cached?.pending||{})){
+    if(next && item && ((item.kind==='nums' && NUMBER_KEYS.includes(item.key)) ||
+       (item.kind==='done' && /^w\d+d[0-6]s\d+$/.test(item.key)))){
+      cloud.pending[item.kind+':'+item.key]={...item,seq:++cloud.seq};
+      applyValue(item.kind,item.key,item.value);
+    }
+  }
+  $('loginForm').hidden=!!next;$('accountControls').hidden=!next;
+  $('accountEmail').textContent=next?.email||'';
+  $('signInPassword').value='';refreshProgress();
+  if(next) syncCloud();else setSyncStatus('Signed out. Showing progress saved in this browser.');
+}
+function mergeImport(raw){
+  if(!raw || typeof raw!=='object' || !raw.done || !raw.nums) throw new Error('Choose a progress JSON backup, not the HTML plan.');
+  const incoming=cleanProgress(raw);
+  for(const [key,value] of Object.entries(incoming.done)){applyValue('done',key,value);queueChange('done',key,value);}
+  for(const [key,value] of Object.entries(incoming.nums)){applyValue('nums',key,value);queueChange('nums',key,value);}
+  refreshProgress();
+}
+function initCloud(){
+  $('exportProgress').addEventListener('click',()=>{
+    const blob=new Blob([JSON.stringify({format:'weymouth703-progress-v1',exported_at:new Date().toISOString(),...store},null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='weymouth-progress-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+  $('importProgress').addEventListener('change',async e=>{
+    const file=e.target.files[0];if(!file) return;
+    try{
+      if(file.size>2000000) throw new Error('This backup is too large.');
+      const raw=JSON.parse(await file.text());
+      if(confirm('Merge this backup into the progress currently shown? Included benchmark numbers will replace the current numbers.')) mergeImport(raw);
+    }catch(error){setSyncStatus('Import failed: '+error.message);}finally{e.target.value='';}
+  });
+  $('importBrowserProgress').addEventListener('click',()=>{
+    const raw=readCache(STORE_KEY);
+    if(!raw){setSyncStatus('No signed-out progress was found on this website in this browser. Import a JSON backup if it was saved at another address.');return;}
+    if(confirm('Import signed-out progress from this browser into your account? Included benchmark numbers will replace the current numbers.')) mergeImport(raw);
+  });
+  const config=window.WEYMOUTH_CLOUD||{};
+  if(!config.url || !config.publishableKey){setSyncStatus('Cloud sync is not configured yet. Progress is saved in this browser. Follow SETUP.md to connect it.');$('loginForm').hidden=true;return;}
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(config.url) || !config.publishableKey.startsWith('sb_publishable_')){
+    setSyncStatus('Check the project URL and publishable key in the cloud configuration.');$('loginForm').hidden=true;return;
+  }
+  setSyncStatus('Connecting…');$('signInButton').disabled=true;
+  const script=document.createElement('script');script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+  script.onerror=()=>setSyncStatus('Could not load cloud sign-in. Check your connection and reload. Browser progress is still available.');
+  script.onload=async()=>{
+    try{
+      cloud.client=window.supabase.createClient(config.url,config.publishableKey);
+      cloud.client.auth.onAuthStateChange((_event,session)=>setTimeout(()=>changeAccount(session),0));
+      const {data,error}=await cloud.client.auth.getSession();if(error) throw error;
+      changeAccount(data.session);
+      if(!data.session) setSyncStatus('Saved in this browser. Sign in to sync across devices.');
+      $('signInButton').disabled=false;
+    }catch(error){setSyncStatus('Could not start sign-in: '+error.message);}
+  };document.head.appendChild(script);
+  $('loginForm').addEventListener('submit',async e=>{
+    e.preventDefault();$('signInButton').disabled=true;setSyncStatus('Signing in…');
+    try{
+      const {data,error}=await cloud.client.auth.signInWithPassword({email:$('signInEmail').value.trim(),password:$('signInPassword').value});
+      if(error) throw error;changeAccount(data.session);
+    }catch(error){setSyncStatus('Sign-in failed: '+error.message);}
+    finally{$('signInButton').disabled=false;}
+  });
+  $('signOutButton').addEventListener('click',async()=>{
+    if(Object.keys(cloud.pending).length && !confirm('Some changes have not synced. They will stay in this browser for this account. Sign out anyway?')) return;
+    const {error}=await cloud.client.auth.signOut({scope:'local'});
+    if(error) setSyncStatus('Could not sign out: '+error.message);else changeAccount(null);
+  });
+  $('syncNow').addEventListener('click',syncCloud);
+  window.addEventListener('online',syncCloud);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden) syncCloud();});
+  // Other tabs on this same device trigger a fresh cloud read.
+  window.addEventListener('storage',e=>{if(e.key===cacheKey()) syncCloud();});
+  setInterval(()=>{if(!document.hidden) syncCloud();},30000);
+}
+
+
 /* Events */
 function init(){
   goToday();
@@ -1467,7 +1665,7 @@ function init(){
   });
   $("sessions").addEventListener("change",e=>{
     const c=e.target.closest("[data-done]"); if(!c) return;
-    const id=c.getAttribute("data-done"); if(c.checked) store.done[id]=true; else delete store.done[id]; save();
+    const id=c.getAttribute("data-done"); if(c.checked) store.done[id]=true; else delete store.done[id]; save("done",id,c.checked);
     renderWeek(); const nc=document.querySelector('[data-done="'+id+'"]'); if(nc) nc.focus();
   });
   document.addEventListener("keydown",e=>{
@@ -1494,6 +1692,7 @@ function init(){
     if(!tA||!tB||dA<=dB||tA<=tB) return;
     setNum("css", (tA-tB)/((dA-dB)/100)); syncInputs();
   });
+  initCloud();
 }
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init); else init();
 </script>
