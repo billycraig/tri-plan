@@ -117,6 +117,12 @@ select,input{font:inherit;color:var(--ink);background:var(--panel);border:1px so
 .daybtn .tot{margin-top:auto;font-size:.82rem;color:var(--muted);display:flex;justify-content:space-between;gap:4px}
 .daybtn .tot b{color:var(--ink);font-weight:650}
 
+.daybtn.drop-target{outline:3px dashed var(--focus);outline-offset:-4px}
+.session-move{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:0 12px 10px;font-size:.85rem;color:var(--muted)}
+.drag-handle{cursor:grab;border:1px solid var(--rule-strong);border-radius:4px;padding:5px 9px;color:var(--ink)}
+.sess.dragging{opacity:.5}
+.session-move select{font-size:.85rem;min-height:32px;padding:4px 6px}
+.move-help{font-size:.85rem;color:var(--muted)}
 /* Day detail */
 .daydetail{background:var(--panel);border:1px solid var(--ink);border-top-width:0;padding:14px 18px 20px;margin-bottom:36px}
 .dayhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
@@ -288,6 +294,8 @@ table.z td:first-child{font-weight:600}
     </div>
 
     <div class="weekhead" id="weekhead"></div>
+    <p class="move-help">Drag a session by its handle onto a day below, or use its Move to menu. Placements save in this browser.</p>
+    <p id="moveStatus" class="move-help" role="status" aria-live="polite"></p>
     <div class="days" id="days" role="tablist" aria-label="Days of the week"></div>
     <div class="daydetail" id="daydetail" role="tabpanel">
       <div class="dayhead">
@@ -1254,12 +1262,34 @@ const STORE_KEY="weymouth703:v1";
 const $=id=>document.getElementById(id);
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
-let store={done:{}, nums:{}};
-try{ const raw=localStorage.getItem(STORE_KEY); if(raw){ const o=JSON.parse(raw); if(o&&typeof o==="object"){ store.done=o.done||{}; store.nums=o.nums||{}; } } }catch(e){}
+let store={done:{}, nums:{}, moves:{}};
+try{ const raw=localStorage.getItem(STORE_KEY); if(raw){ const o=JSON.parse(raw); if(o&&typeof o==="object"){ store.done=o.done||{}; store.nums=o.nums||{}; store.moves=o.moves||{}; } } }catch(e){}
 
 ["ftp","tpace","css","hrmax"].forEach(k=>{ const v=Number(store.nums[k]); N[k]= isFinite(v) && v>0 ? v : null; });
 
 const PLAN=buildPlan();
+const ORIGINAL_DAYS=PLAN.map(wk=>wk.days.map(arr=>arr.slice()));
+function applyPlacements(){
+  PLAN.forEach((wk,i)=>{
+    wk.days=Array.from({length:7},()=>[]);
+    ORIGINAL_DAYS[i].forEach((arr,d)=>arr.forEach(session=>{
+      const to=store.moves[session.id];
+      wk.days[Number.isInteger(to)&&to>=0&&to<7?to:d].push(session);
+    }));
+  });
+}
+applyPlacements();
+let draggedSession=null;
+function moveSession(id,to){
+  const wk=PLAN[state.week-1];
+  if(!Number.isInteger(to)||to<0||to>6) return;
+  const from=wk.days.findIndex(arr=>arr.some(s=>s.id===id));
+  if(from<0||from===to) return;
+  const session=wk.days[from].find(s=>s.id===id);
+  store.moves[id]=to;
+  applyPlacements();persistProgress();state.day=to;renderWeek();
+  $('moveStatus').textContent=session.title+' moved to '+DAYS[to]+'. Saved in this browser.';
+}
 const state={week:1, day:0, open:new Set(), allOpen:false};
 
 function todayLocal(){ const t=new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
@@ -1394,7 +1424,7 @@ function sessHTML(s){
         '<span class="sess-dur">'+(s.min>0?fmtDur(s.min):'')+'</span>'+
         '<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>'+
       '</button>'+
-    '</div>'+body+'</article>';
+    '</div>'+(s.sport!=='rest'?'<div class="session-move"><span class="drag-handle" draggable="true" data-drag="'+s.id+'" title="Drag onto a day above">&#8942;&#8942; Drag session</span><label>Move to <select data-move="'+s.id+'" aria-label="Move '+esc(s.title)+' to a day">'+DAYS.map((day,d)=>'<option value="'+d+'" '+(d===state.day?'selected':'')+'>'+day+'</option>').join('')+'</select></label></div>':'')+body+'</article>';
 }
 function renderDay(){
   const wk=PLAN[state.week-1], arr=wk.days[state.day], dt=dateOf(wk.w,state.day);
@@ -1486,12 +1516,14 @@ function showTab(id){
 const cloud = {client:null, user:null, epoch:0, busy:false, again:false, timer:null, pending:{}, seq:0, cacheOK:true};
 const NUMBER_KEYS = ['ftp','tpace','css','hrmax'];
 function cleanProgress(o){
-  const out={done:{},nums:{}};
+  const out={done:{},nums:{},moves:{}};
   if(!o || typeof o!=='object') return out;
   for(const [k,v] of Object.entries(o.done||{})) if(/^w\d+d[0-6]s\d+$/.test(k) && v===true) out.done[k]=true;
   for(const k of NUMBER_KEYS) if(Object.hasOwn(o.nums||{},k)){
     const v=o.nums[k]; out.nums[k]=typeof v==='number' && Number.isFinite(v) && v>0 ? v : null;
   }
+  for(const [key,value] of Object.entries(o.moves||{}))
+    if(/^w\d+d[0-6]s\d+$/.test(key)&&Number.isInteger(value)&&value>=0&&value<7) out.moves[key]=value;
   return out;
 }
 function readCache(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch{return null;}}
@@ -1506,6 +1538,7 @@ function applyValue(kind,key,value){
   else if(NUMBER_KEYS.includes(key)) store.nums[key]=typeof value==='number' && value>0 ? value : null;
 }
 function refreshProgress(){
+  applyPlacements();
   NUMBER_KEYS.forEach(k=>{N[k]=store.nums[k]||null;});
   // Do not replace a partly typed benchmark with a background refresh.
   if(!NUMBER_KEYS.includes(document.activeElement?.id)) syncInputs();
@@ -1576,6 +1609,7 @@ function mergeImport(raw){
   const incoming=cleanProgress(raw);
   for(const [key,value] of Object.entries(incoming.done)){applyValue('done',key,value);queueChange('done',key,value);}
   for(const [key,value] of Object.entries(incoming.nums)){applyValue('nums',key,value);queueChange('nums',key,value);}
+  Object.assign(store.moves,incoming.moves);persistProgress();
   refreshProgress();
 }
 function initCloud(){
@@ -1663,7 +1697,31 @@ function init(){
     const id=b.getAttribute("data-open"); if(state.open.has(id)) state.open.delete(id); else state.open.add(id);
     renderDay(); const nb=document.querySelector('[data-open="'+id+'"]'); if(nb) nb.focus();
   });
+  $("sessions").addEventListener("dragstart",e=>{
+    const h=e.target.closest('[data-drag]');if(!h) return;
+    draggedSession={id:h.dataset.drag,week:state.week};
+    e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',h.dataset.drag);
+    h.closest('.sess').classList.add('dragging');
+  });
+  function clearDrag(){
+    draggedSession=null;document.querySelectorAll('.drop-target,.dragging').forEach(el=>el.classList.remove('drop-target','dragging'));
+  }
+  $("sessions").addEventListener('dragend',clearDrag);
+  $("days").addEventListener('dragover',e=>{
+    const d=e.target.closest('[data-day]');if(!d||draggedSession?.week!==state.week) return;
+    e.preventDefault();e.dataTransfer.dropEffect='move';
+    document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));d.classList.add('drop-target');
+  });
+  $("days").addEventListener('dragleave',e=>{
+    const d=e.target.closest('[data-day]');if(d&&!d.contains(e.relatedTarget)) d.classList.remove('drop-target');
+  });
+  $("days").addEventListener('drop',e=>{
+    const d=e.target.closest('[data-day]');if(!d||draggedSession?.week!==state.week) return;
+    e.preventDefault();moveSession(draggedSession.id,Number(d.dataset.day));clearDrag();
+  });
   $("sessions").addEventListener("change",e=>{
+    const move=e.target.closest('[data-move]');
+    if(move){moveSession(move.dataset.move,Number(move.value));return;}
     const c=e.target.closest("[data-done]"); if(!c) return;
     const id=c.getAttribute("data-done"); if(c.checked) store.done[id]=true; else delete store.done[id]; save("done",id,c.checked);
     renderWeek(); const nc=document.querySelector('[data-done="'+id+'"]'); if(nc) nc.focus();
