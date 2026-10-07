@@ -123,6 +123,10 @@ select,input{font:inherit;color:var(--ink);background:var(--panel);border:1px so
 .sess.dragging{opacity:.5}
 .session-move select{font-size:.85rem;min-height:32px;padding:4px 6px}
 .move-help{font-size:.85rem;color:var(--muted)}
+.session-notes{padding:0 12px 10px;font-size:.85rem;color:var(--muted)}
+.session-notes summary{cursor:pointer;width:fit-content;padding:3px 0}
+.session-notes textarea{display:block;width:100%;min-height:90px;max-height:280px;resize:vertical;margin-top:6px;padding:9px 10px;border:1px solid var(--rule-strong);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;line-height:1.5}
+.session-notes .note-status{display:block;margin-top:4px;font-size:.78rem}
 /* Day detail */
 .daydetail{background:var(--panel);border:1px solid var(--ink);border-top-width:0;padding:14px 18px 20px;margin-bottom:36px}
 .dayhead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
@@ -1262,8 +1266,8 @@ const STORE_KEY="weymouth703:v1";
 const $=id=>document.getElementById(id);
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 
-let store={done:{}, nums:{}, moves:{}};
-try{ const raw=localStorage.getItem(STORE_KEY); if(raw){ const o=JSON.parse(raw); if(o&&typeof o==="object"){ store.done=o.done||{}; store.nums=o.nums||{}; store.moves=o.moves||{}; } } }catch(e){}
+let store={done:{}, nums:{}, moves:{}, notes:{}};
+try{ const raw=localStorage.getItem(STORE_KEY); if(raw){ const o=JSON.parse(raw); if(o&&typeof o==="object"){ store.done=o.done||{}; store.nums=o.nums||{}; store.moves=o.moves||{}; store.notes=o.notes||{}; } } }catch(e){}
 
 ["ftp","tpace","css","hrmax"].forEach(k=>{ const v=Number(store.nums[k]); N[k]= isFinite(v) && v>0 ? v : null; });
 
@@ -1424,7 +1428,13 @@ function sessHTML(s){
         '<span class="sess-dur">'+(s.min>0?fmtDur(s.min):'')+'</span>'+
         '<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>'+
       '</button>'+
-    '</div>'+(s.sport!=='rest'?'<div class="session-move"><span class="drag-handle" draggable="true" data-drag="'+s.id+'" title="Drag onto a day above">&#8942;&#8942; Drag session</span><label>Move to <select data-move="'+s.id+'" aria-label="Move '+esc(s.title)+' to a day">'+DAYS.map((day,d)=>'<option value="'+d+'" '+(d===state.day?'selected':'')+'>'+day+'</option>').join('')+'</select></label></div>':'')+body+'</article>';
+    '</div>'+(s.sport!=='rest'?'<div class="session-move"><span class="drag-handle" draggable="true" data-drag="'+s.id+'" title="Drag onto a day above">&#8942;&#8942; Drag session</span><label>Move to <select data-move="'+s.id+'" aria-label="Move '+esc(s.title)+' to a day">'+DAYS.map((day,d)=>'<option value="'+d+'" '+(d===state.day?'selected':'')+'>'+day+'</option>').join('')+'</select></label></div>':'')+sessionNotesHTML(s)+body+'</article>';
+}
+function sessionNotesHTML(s){
+  const note=typeof store.notes[s.id]==='string'?store.notes[s.id]:'';
+  return '<details class="session-notes"><summary>Your notes'+(note.trim()?' · saved':'')+'</summary>'+
+    '<textarea data-note="'+s.id+'" aria-label="Your notes for '+esc(s.title)+'" placeholder="How did it feel? Record effort, weights, niggles or anything to remember." rows="3">'+esc(note)+'</textarea>'+
+    '<span class="note-status" role="status">Saves automatically in this browser. Included in progress backups.</span></details>';
 }
 function renderDay(){
   const wk=PLAN[state.week-1], arr=wk.days[state.day], dt=dateOf(wk.w,state.day);
@@ -1516,7 +1526,7 @@ function showTab(id){
 const cloud = {client:null, user:null, epoch:0, busy:false, again:false, timer:null, pending:{}, seq:0, cacheOK:true};
 const NUMBER_KEYS = ['ftp','tpace','css','hrmax'];
 function cleanProgress(o){
-  const out={done:{},nums:{},moves:{}};
+  const out={done:{},nums:{},moves:{},notes:{}};
   if(!o || typeof o!=='object') return out;
   for(const [k,v] of Object.entries(o.done||{})) if(/^w\d+d[0-6]s\d+$/.test(k) && v===true) out.done[k]=true;
   for(const k of NUMBER_KEYS) if(Object.hasOwn(o.nums||{},k)){
@@ -1524,6 +1534,8 @@ function cleanProgress(o){
   }
   for(const [key,value] of Object.entries(o.moves||{}))
     if(/^w\d+d[0-6]s\d+$/.test(key)&&Number.isInteger(value)&&value>=0&&value<7) out.moves[key]=value;
+  for(const [key,value] of Object.entries(o.notes||{}))
+    if(/^w\d+d[0-6]s\d+$/.test(key)&&typeof value==='string'&&value.trim()) out.notes[key]=value;
   return out;
 }
 function readCache(key){try{return JSON.parse(localStorage.getItem(key)||'null');}catch{return null;}}
@@ -1542,7 +1554,7 @@ function refreshProgress(){
   NUMBER_KEYS.forEach(k=>{N[k]=store.nums[k]||null;});
   // Do not replace a partly typed benchmark with a background refresh.
   if(!NUMBER_KEYS.includes(document.activeElement?.id)) syncInputs();
-  renderWeek();renderZones();renderRaceTargets();
+  if(!document.activeElement?.matches('[data-note]')) renderWeek();renderZones();renderRaceTargets();
 }
 function queueChange(kind,key,value){
   if(cloud.user){cloud.pending[kind+':'+key]={kind,key,value,seq:++cloud.seq};}
@@ -1609,7 +1621,7 @@ function mergeImport(raw){
   const incoming=cleanProgress(raw);
   for(const [key,value] of Object.entries(incoming.done)){applyValue('done',key,value);queueChange('done',key,value);}
   for(const [key,value] of Object.entries(incoming.nums)){applyValue('nums',key,value);queueChange('nums',key,value);}
-  Object.assign(store.moves,incoming.moves);persistProgress();
+  Object.assign(store.moves,incoming.moves);Object.assign(store.notes,incoming.notes);persistProgress();
   refreshProgress();
 }
 function initCloud(){
@@ -1718,6 +1730,15 @@ function init(){
   $("days").addEventListener('drop',e=>{
     const d=e.target.closest('[data-day]');if(!d||draggedSession?.week!==state.week) return;
     e.preventDefault();moveSession(draggedSession.id,Number(d.dataset.day));clearDrag();
+  });
+  $("sessions").addEventListener('input',e=>{
+    const field=e.target.closest('[data-note]');if(!field) return;
+    if(field.value.trim()) store.notes[field.dataset.note]=field.value;
+    else delete store.notes[field.dataset.note];
+    persistProgress();
+    const panel=field.closest('.session-notes');
+    panel.querySelector('summary').textContent='Your notes'+(field.value.trim()?' · saved':'');
+    panel.querySelector('.note-status').textContent=cloud.cacheOK?'Saved in this browser. Included in progress backups.':'Browser saving is unavailable. Export progress to keep your notes.';
   });
   $("sessions").addEventListener("change",e=>{
     const move=e.target.closest('[data-move]');
